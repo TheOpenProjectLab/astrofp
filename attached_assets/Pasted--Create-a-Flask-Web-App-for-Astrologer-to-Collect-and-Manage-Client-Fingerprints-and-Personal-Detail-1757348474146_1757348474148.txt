@@ -1,0 +1,138 @@
+"Create a Flask Web App for Astrologer to Collect and Manage Client Fingerprints and Personal Details"
+
+🎯 Objective:
+
+Build a user-friendly, modern, and secure web application using Python Flask, integrated with HTML/CSS/JavaScript for the front-end UI. The app is intended for an astrologer to collect personal details and high-resolution fingerprint scans of users.
+
+💡 Functional Requirements:
+1. Two-Step Form Submission:
+
+Form 1: User Details
+
+Name (Title, First, Middle, Last)
+
+Gender (Dropdown: Male, Female, Other)
+
+Date of Birth (Date Picker)
+
+Mobile Number (Input with validation)
+
+Email (Input with validation)
+
+Address (Multiline text)
+
+“Next” Button to proceed to fingerprint form
+
+Form 2: Upload Fingerprints
+
+Fingerprint upload fields for all 10 fingers:
+
+L1 to L5 (Left Thumb to Pinky)
+
+R1 to R5 (Right Thumb to Pinky)
+
+Each should accept high-resolution image upload (JPG/PNG, 300dpi+)
+
+Show thumbnail preview of uploaded images
+
+Upload progress/status indicators
+
+Notes or “Remarks” field (optional)
+
+“Submit” Button
+
+2. Download Submitted Data as PDF:
+
+After form submission, auto-generate a PDF with:
+
+All user details
+
+Embedded uploaded fingerprint images
+
+Timestamp of submission
+
+Download link/button (e.g., "Download My Report")
+
+3. User Dashboard (Optional but Recommended):
+
+After login or entering phone/email, users can:
+
+View their submission history
+
+Download past submissions as PDFs
+
+Update fingerprints (optional)
+
+🌈 UI/UX Requirements:
+
+Use a modern, minimal, and clean interface.
+
+Responsive design (Mobile, Tablet, Desktop).
+
+Use visually distinct left and right hand illustrations like in the reference images.
+
+Use tooltips, icons, and progress indicators.
+
+Use visual cues for form validation (e.g., green checkmarks, red warnings).
+
+Suggested UI frameworks:
+
+Bootstrap 5 or Tailwind CSS
+
+JavaScript: Vanilla JS or minimal usage of libraries like jQuery for simplicity
+
+🔐 Security & Validation:
+
+Image uploads should have:
+
+File type and size validation
+
+Client-side & server-side checks
+
+Store sensitive data securely (hashed or encrypted where necessary)
+
+Implement basic CSRF protection and form validation
+
+🧰 Technology Stack:
+
+Backend: Python Flask (with Flask-WTF or WTForms for form validation)
+
+Frontend: HTML, CSS (Bootstrap/Tailwind), JS
+
+PDF Generation: WeasyPrint or ReportLab
+
+File Uploads: Flask-Uploads or Flask-Dropzone
+
+Optional Authentication: Flask-Login for future dashboard features
+
+🌟 Bonus Features (Optional But Valuable):
+
+Login/Authentication for repeat users
+
+Admin Dashboard for astrologer to:
+
+View submissions
+
+Search/filter/export user data
+
+Calendar picker that shows zodiac signs based on DOB
+
+Auto-age calculator from date of birth
+
+Image enhancement or zoom feature for uploaded fingerprints
+
+Multilingual support
+
+📁 Deliverables:
+
+Fully functional Flask web app
+
+Clean and commented source code
+
+HTML templates with good UI/UX
+
+CSS and JS assets (custom or framework-based)
+
+Working PDF download function
+
+Documentation or README
