@@ -1,389 +1,616 @@
-{% extends "base.html" %}
+{% extends "base.html" %} {% block title %}Step 2: Fingerprint Upload -
+Astrological Fingerprint Collection{% endblock %} {% block content %}
 
-{% block title %}Step 2: Fingerprint Upload - Astrological Fingerprint Collection{% endblock %}
+<style>
+  .hand-svg {
+    width: 220px;
+    height: 220px;
+  }
+  .finger-circle {
+    fill: #e9ecef;
+    stroke: #495057;
+    cursor: pointer;
+  }
+  .finger-label {
+    font-size: 12px;
+    font-weight: bold;
+    fill: #212529;
+  }
+</style>
 
-{% block content %}
 <div class="container py-5">
-    <div class="row justify-content-center">
-        <div class="col-lg-10">
-            <!-- Progress Indicator -->
-            <div class="progress-indicator mb-5">
-                <div class="step-progress">
-                    <div class="step completed">
-                        <div class="step-number"><i class="fas fa-check"></i></div>
-                        <div class="step-title">Personal Details</div>
-                    </div>
-                    <div class="step-connector completed"></div>
-                    <div class="step active">
-                        <div class="step-number">2</div>
-                        <div class="step-title">Fingerprints</div>
-                    </div>
-                    <div class="step-connector"></div>
-                    <div class="step">
-                        <div class="step-number">3</div>
-                        <div class="step-title">Complete</div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Client Info Summary -->
-            {% if client_data %}
-            <div class="card mb-4">
-                <div class="card-body bg-light">
-                    <h6 class="text-primary mb-2">
-                        <i class="fas fa-user me-2"></i>Client Information
-                    </h6>
-                    <div class="row">
-                        <div class="col-md-8">
-                            <strong>{{ client_data.title }} {{ client_data.first_name }} {{ client_data.last_name }}</strong>
-                            <span class="text-muted ms-2">{{ client_data.email }}</span>
-                        </div>
-                        <div class="col-md-4 text-end">
-                            <a href="{{ url_for('step1_personal_details') }}" class="btn btn-sm btn-outline-primary">
-                                <i class="fas fa-edit me-1"></i>Edit Details
-                            </a>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            {% endif %}
-
-            <!-- Main Form Card -->
-            <div class="card shadow-lg">
-                <div class="card-header bg-primary text-white">
-                    <h4 class="mb-0">
-                        <i class="fas fa-hand-paper me-2"></i>
-                        Step 2: Fingerprint Upload
-                    </h4>
-                    <small>Upload high-resolution images of all 10 fingerprints (JPG/PNG format)</small>
-                </div>
-                
-                <div class="card-body">
-                    <form method="POST" enctype="multipart/form-data" id="fingerprintForm">
-                        {{ form.hidden_tag() }}
-                        
-                        <!-- Upload Instructions -->
-                        <div class="alert alert-info mb-4">
-                            <h6 class="alert-heading">
-                                <i class="fas fa-info-circle me-2"></i>Upload Instructions
-                            </h6>
-                            <ul class="mb-0">
-                                <li>Upload clear, high-resolution images (300dpi or higher recommended)</li>
-                                <li>Accepted formats: JPG, JPEG, PNG</li>
-                                <li>Maximum file size: 16MB per image</li>
-                                <li>You can upload any combination of fingers (at least 1 required)</li>
-                            </ul>
-                        </div>
-
-                        <!-- Fingerprint Upload Grid -->
-                        <div class="row">
-                            <!-- Left Hand -->
-                            <div class="col-lg-6">
-                                <div class="hand-section mb-4">
-                                    <h5 class="text-center mb-3 text-primary">
-                                        <i class="fas fa-hand-paper me-2"></i>Left Hand
-                                    </h5>
-                                    
-                                    <div class="hand-visual mb-4">
-                                        <svg viewBox="0 0 200 300" class="hand-svg left-hand">
-                                            <!-- Left Hand SVG -->
-                                            <path d="M100,280 Q90,270 85,250 L80,200 Q75,180 80,160 L85,140 Q90,120 100,110 Q110,100 120,95 Q130,90 140,95 Q150,100 155,110 L160,130 Q165,150 160,170 L155,190 Q150,210 145,230 L140,250 Q135,270 125,280 Z" 
-                                                  fill="#f8f9fa" stroke="#dee2e6" stroke-width="2"/>
-                                            <!-- Fingers -->
-                                            <circle cx="120" cy="90" r="15" fill="#e9ecef" stroke="#6c757d" class="finger-circle" data-finger="L1"/>
-                                            <circle cx="140" cy="80" r="12" fill="#e9ecef" stroke="#6c757d" class="finger-circle" data-finger="L2"/>
-                                            <circle cx="155" cy="85" r="12" fill="#e9ecef" stroke="#6c757d" class="finger-circle" data-finger="L3"/>
-                                            <circle cx="165" cy="95" r="10" fill="#e9ecef" stroke="#6c757d" class="finger-circle" data-finger="L4"/>
-                                            <circle cx="170" cy="110" r="8" fill="#e9ecef" stroke="#6c757d" class="finger-circle" data-finger="L5"/>
-                                            
-                                            <text x="120" y="95" text-anchor="middle" class="finger-label">1</text>
-                                            <text x="140" y="85" text-anchor="middle" class="finger-label">2</text>
-                                            <text x="155" y="90" text-anchor="middle" class="finger-label">3</text>
-                                            <text x="165" y="100" text-anchor="middle" class="finger-label">4</text>
-                                            <text x="170" y="115" text-anchor="middle" class="finger-label">5</text>
-                                        </svg>
-                                    </div>
-                                    
-                                    <!-- Left Hand Upload Fields -->
-                                    <div class="upload-grid">
-                                        {% for field_name in ['L1', 'L2', 'L3', 'L4', 'L5'] %}
-                                            {% set finger_names = {'L1': 'Thumb', 'L2': 'Index', 'L3': 'Middle', 'L4': 'Ring', 'L5': 'Pinky'} %}
-                                            <div class="upload-item mb-3" data-finger="{{ field_name }}">
-                                                <label class="form-label">
-                                                    <i class="fas fa-fingerprint me-1"></i>
-                                                    {{ finger_names[field_name] }} ({{ field_name }})
-                                                </label>
-                                                {{ form[field_name](class="form-control file-input", accept=".jpg,.jpeg,.png") }}
-                                                <div class="upload-preview mt-2" style="display: none;">
-                                                    <img class="preview-image" src="" alt="Preview">
-                                                    <button type="button" class="btn btn-sm btn-outline-danger remove-file">
-                                                        <i class="fas fa-times"></i>
-                                                    </button>
-                                                </div>
-                                                {% if form[field_name].errors %}
-                                                    <div class="text-danger mt-1">
-                                                        {% for error in form[field_name].errors %}
-                                                            <small>{{ error }}</small>
-                                                        {% endfor %}
-                                                    </div>
-                                                {% endif %}
-                                            </div>
-                                        {% endfor %}
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- Right Hand -->
-                            <div class="col-lg-6">
-                                <div class="hand-section mb-4">
-                                    <h5 class="text-center mb-3 text-primary">
-                                        <i class="fas fa-hand-paper me-2"></i>Right Hand
-                                    </h5>
-                                    
-                                    <div class="hand-visual mb-4">
-                                        <svg viewBox="0 0 200 300" class="hand-svg right-hand">
-                                            <!-- Right Hand SVG (mirrored) -->
-                                            <path d="M100,280 Q110,270 115,250 L120,200 Q125,180 120,160 L115,140 Q110,120 100,110 Q90,100 80,95 Q70,90 60,95 Q50,100 45,110 L40,130 Q35,150 40,170 L45,190 Q50,210 55,230 L60,250 Q65,270 75,280 Z" 
-                                                  fill="#f8f9fa" stroke="#dee2e6" stroke-width="2"/>
-                                            <!-- Fingers -->
-                                            <circle cx="80" cy="90" r="15" fill="#e9ecef" stroke="#6c757d" class="finger-circle" data-finger="R1"/>
-                                            <circle cx="60" cy="80" r="12" fill="#e9ecef" stroke="#6c757d" class="finger-circle" data-finger="R2"/>
-                                            <circle cx="45" cy="85" r="12" fill="#e9ecef" stroke="#6c757d" class="finger-circle" data-finger="R3"/>
-                                            <circle cx="35" cy="95" r="10" fill="#e9ecef" stroke="#6c757d" class="finger-circle" data-finger="R4"/>
-                                            <circle cx="30" cy="110" r="8" fill="#e9ecef" stroke="#6c757d" class="finger-circle" data-finger="R5"/>
-                                            
-                                            <text x="80" y="95" text-anchor="middle" class="finger-label">1</text>
-                                            <text x="60" y="85" text-anchor="middle" class="finger-label">2</text>
-                                            <text x="45" y="90" text-anchor="middle" class="finger-label">3</text>
-                                            <text x="35" y="100" text-anchor="middle" class="finger-label">4</text>
-                                            <text x="30" y="115" text-anchor="middle" class="finger-label">5</text>
-                                        </svg>
-                                    </div>
-                                    
-                                    <!-- Right Hand Upload Fields -->
-                                    <div class="upload-grid">
-                                        {% for field_name in ['R1', 'R2', 'R3', 'R4', 'R5'] %}
-                                            {% set finger_names = {'R1': 'Thumb', 'R2': 'Index', 'R3': 'Middle', 'R4': 'Ring', 'R5': 'Pinky'} %}
-                                            <div class="upload-item mb-3" data-finger="{{ field_name }}">
-                                                <label class="form-label">
-                                                    <i class="fas fa-fingerprint me-1"></i>
-                                                    {{ finger_names[field_name] }} ({{ field_name }})
-                                                </label>
-                                                {{ form[field_name](class="form-control file-input", accept=".jpg,.jpeg,.png") }}
-                                                <div class="upload-preview mt-2" style="display: none;">
-                                                    <img class="preview-image" src="" alt="Preview">
-                                                    <button type="button" class="btn btn-sm btn-outline-danger remove-file">
-                                                        <i class="fas fa-times"></i>
-                                                    </button>
-                                                </div>
-                                                {% if form[field_name].errors %}
-                                                    <div class="text-danger mt-1">
-                                                        {% for error in form[field_name].errors %}
-                                                            <small>{{ error }}</small>
-                                                        {% endfor %}
-                                                    </div>
-                                                {% endif %}
-                                            </div>
-                                        {% endfor %}
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Remarks -->
-                        <div class="mb-4">
-                            <label for="{{ form.remarks.id }}" class="form-label">
-                                <i class="fas fa-comment me-1"></i>Remarks (Optional)
-                            </label>
-                            {{ form.remarks(class="form-control", rows="3", placeholder="Any additional notes or comments...") }}
-                            {% if form.remarks.errors %}
-                                <div class="text-danger mt-1">
-                                    {% for error in form.remarks.errors %}
-                                        <small>{{ error }}</small>
-                                    {% endfor %}
-                                </div>
-                            {% endif %}
-                        </div>
-
-                        <!-- Upload Progress -->
-                        <div id="uploadProgress" class="mb-3" style="display: none;">
-                            <div class="progress">
-                                <div class="progress-bar progress-bar-striped progress-bar-animated" 
-                                     role="progressbar" style="width: 0%"></div>
-                            </div>
-                            <small class="text-muted mt-1">Processing uploads...</small>
-                        </div>
-
-                        <!-- Action Buttons -->
-                        <div class="d-flex justify-content-between">
-                            {{ form.back(class="btn btn-outline-secondary btn-lg") }}
-                            {{ form.submit(class="btn btn-success btn-lg", id="submitBtn") }}
-                        </div>
-                    </form>
-                </div>
-            </div>
-            
-            <!-- Upload Summary -->
-            <div class="mt-4">
-                <div class="card">
-                    <div class="card-body">
-                        <h6 class="text-primary mb-3">
-                            <i class="fas fa-chart-bar me-2"></i>Upload Summary
-                        </h6>
-                        <div class="row text-center">
-                            <div class="col-6">
-                                <div class="upload-stat">
-                                    <div class="stat-number" id="uploadedCount">0</div>
-                                    <div class="stat-label">Uploaded</div>
-                                </div>
-                            </div>
-                            <div class="col-6">
-                                <div class="upload-stat">
-                                    <div class="stat-number">10</div>
-                                    <div class="stat-label">Total Fingers</div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
+  <div class="row justify-content-center">
+    <div class="col-lg-10">
+      <!-- Progress Indicator -->
+      <div class="progress-indicator mb-5">
+        <div class="step-progress">
+          <div class="step completed">
+            <div class="step-number"><i class="fas fa-check"></i></div>
+            <div class="step-title">Personal Details</div>
+          </div>
+          <div class="step-connector completed"></div>
+          <div class="step active">
+            <div class="step-number">2</div>
+            <div class="step-title">Fingerprints</div>
+          </div>
+          <div class="step-connector"></div>
+          <div class="step">
+            <div class="step-number">3</div>
+            <div class="step-title">Complete</div>
+          </div>
         </div>
-    </div>
-</div>
-{% endblock %}
+      </div>
 
-{% block extra_scripts %}
+      <!-- Client Info Summary -->
+      {% if client_data %}
+      <div class="card mb-4">
+        <div class="card-body bg-light">
+          <h6 class="text-primary mb-2">
+            <i class="fas fa-user me-2"></i>Client Information
+          </h6>
+          <div class="row">
+            <div class="col-md-8">
+              <strong
+                >{{ client_data.title }} {{ client_data.first_name }} {{
+                client_data.last_name }}</strong
+              >
+              <span class="text-muted ms-2">{{ client_data.email }}</span>
+            </div>
+            <div class="col-md-4 text-end">
+              <a
+                href="{{ url_for('step1_personal_details') }}"
+                class="btn btn-sm btn-outline-primary"
+              >
+                <i class="fas fa-edit me-1"></i>Edit Details
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+      {% endif %}
+
+      <!-- Main Form Card -->
+      <div class="card shadow-lg">
+        <div class="card-header bg-primary text-white">
+          <h4 class="mb-0">
+            <i class="fas fa-hand-paper me-2"></i>
+            Step 2: Fingerprint Upload
+          </h4>
+          <small
+            >Upload high-resolution images of all 10 fingerprints (JPG/PNG
+            format)</small
+          >
+        </div>
+
+        <div class="card-body">
+          <form
+            method="POST"
+            enctype="multipart/form-data"
+            id="fingerprintForm"
+          >
+            {{ form.hidden_tag() }}
+
+            <!-- Upload Instructions -->
+            <div class="alert alert-info mb-4">
+              <h6 class="alert-heading">
+                <i class="fas fa-info-circle me-2"></i>Upload Instructions
+              </h6>
+              <ul class="mb-0">
+                <li>
+                  Upload clear, high-resolution images (300dpi or higher
+                  recommended)
+                </li>
+                <li>Accepted formats: JPG, JPEG, PNG</li>
+                <li>Maximum file size: 16MB per image</li>
+                <li>
+                  You can upload any combination of fingers (at least 1
+                  required)
+                </li>
+              </ul>
+            </div>
+
+            <!-- Fingerprint Upload Grid -->
+            <div class="row">
+              <!-- Left Hand -->
+              <div class="col-lg-6">
+                <div class="hand-section mb-4">
+                  <h5 class="text-center mb-3 text-primary">
+                    <i class="fas fa-hand-paper me-2"></i>Left Hand
+                  </h5>
+
+                  <div class="hand-visual mb-4">
+                    <svg viewBox="0 0 200 250" class="hand-svg left-hand">
+                      <!-- Palm -->
+                      <ellipse
+                        cx="100"
+                        cy="170"
+                        rx="60"
+                        ry="70"
+                        fill="#f8f9fa"
+                        stroke="#adb5bd"
+                        stroke-width="2"
+                      />
+
+                      <!-- Fingers -->
+                      <circle
+                        cx="40"
+                        cy="110"
+                        r="12"
+                        class="finger-circle"
+                        data-finger="L1"
+                      />
+                      <text
+                        x="40"
+                        y="115"
+                        text-anchor="middle"
+                        class="finger-label"
+                      >
+                        L1
+                      </text>
+
+                      <circle
+                        cx="70"
+                        cy="70"
+                        r="12"
+                        class="finger-circle"
+                        data-finger="L2"
+                      />
+                      <text
+                        x="70"
+                        y="75"
+                        text-anchor="middle"
+                        class="finger-label"
+                      >
+                        L2
+                      </text>
+
+                      <circle
+                        cx="100"
+                        cy="55"
+                        r="12"
+                        class="finger-circle"
+                        data-finger="L3"
+                      />
+                      <text
+                        x="100"
+                        y="60"
+                        text-anchor="middle"
+                        class="finger-label"
+                      >
+                        L3
+                      </text>
+
+                      <circle
+                        cx="130"
+                        cy="70"
+                        r="12"
+                        class="finger-circle"
+                        data-finger="L4"
+                      />
+                      <text
+                        x="130"
+                        y="75"
+                        text-anchor="middle"
+                        class="finger-label"
+                      >
+                        L4
+                      </text>
+
+                      <circle
+                        cx="160"
+                        cy="110"
+                        r="12"
+                        class="finger-circle"
+                        data-finger="L5"
+                      />
+                      <text
+                        x="160"
+                        y="115"
+                        text-anchor="middle"
+                        class="finger-label"
+                      >
+                        L5
+                      </text>
+                    </svg>
+                  </div>
+
+                  <!-- Left Hand Upload Fields -->
+                  <div class="upload-grid">
+                    {% for field_name in ['L1', 'L2', 'L3', 'L4', 'L5'] %} {%
+                    set finger_names = {'L1': 'Thumb', 'L2': 'Index', 'L3':
+                    'Middle', 'L4': 'Ring', 'L5': 'Pinky'} %}
+                    <div
+                      class="upload-item mb-3"
+                      data-finger="{{ field_name }}"
+                    >
+                      <label class="form-label">
+                        <i class="fas fa-fingerprint me-1"></i>
+                        {{ finger_names[field_name] }} ({{ field_name }})
+                      </label>
+                      {{ form[field_name](class="form-control file-input",
+                      accept=".jpg,.jpeg,.png") }}
+                      <div class="upload-preview mt-2" style="display: none">
+                        <img class="preview-image" src="" alt="Preview" />
+                        <button
+                          type="button"
+                          class="btn btn-sm btn-outline-danger remove-file"
+                        >
+                          <i class="fas fa-times"></i>
+                        </button>
+                      </div>
+                      {% if form[field_name].errors %}
+                      <div class="text-danger mt-1">
+                        {% for error in form[field_name].errors %}
+                        <small>{{ error }}</small>
+                        {% endfor %}
+                      </div>
+                      {% endif %}
+                    </div>
+                    {% endfor %}
+                  </div>
+                </div>
+              </div>
+
+              <!-- Right Hand -->
+              <div class="col-lg-6">
+                <div class="hand-section mb-4">
+                  <h5 class="text-center mb-3 text-primary">
+                    <i class="fas fa-hand-paper me-2"></i>Right Hand
+                  </h5>
+
+                  <div class="hand-visual mb-4">
+                    <svg viewBox="0 0 200 250" class="hand-svg right-hand">
+                      <!-- Palm -->
+                      <ellipse
+                        cx="100"
+                        cy="170"
+                        rx="60"
+                        ry="70"
+                        fill="#f8f9fa"
+                        stroke="#adb5bd"
+                        stroke-width="2"
+                      />
+
+                      <!-- Fingers -->
+                      <circle
+                        cx="40"
+                        cy="110"
+                        r="12"
+                        class="finger-circle"
+                        data-finger="R1"
+                      />
+                      <text
+                        x="40"
+                        y="115"
+                        text-anchor="middle"
+                        class="finger-label"
+                      >
+                        R1
+                      </text>
+
+                      <circle
+                        cx="70"
+                        cy="70"
+                        r="12"
+                        class="finger-circle"
+                        data-finger="R2"
+                      />
+                      <text
+                        x="70"
+                        y="75"
+                        text-anchor="middle"
+                        class="finger-label"
+                      >
+                        R2
+                      </text>
+
+                      <circle
+                        cx="100"
+                        cy="55"
+                        r="12"
+                        class="finger-circle"
+                        data-finger="R3"
+                      />
+                      <text
+                        x="100"
+                        y="60"
+                        text-anchor="middle"
+                        class="finger-label"
+                      >
+                        R3
+                      </text>
+
+                      <circle
+                        cx="130"
+                        cy="70"
+                        r="12"
+                        class="finger-circle"
+                        data-finger="R4"
+                      />
+                      <text
+                        x="130"
+                        y="75"
+                        text-anchor="middle"
+                        class="finger-label"
+                      >
+                        R4
+                      </text>
+
+                      <circle
+                        cx="160"
+                        cy="110"
+                        r="12"
+                        class="finger-circle"
+                        data-finger="R5"
+                      />
+                      <text
+                        x="160"
+                        y="115"
+                        text-anchor="middle"
+                        class="finger-label"
+                      >
+                        R5
+                      </text>
+                    </svg>
+                  </div>
+
+                  <!-- Right Hand Upload Fields -->
+                  <div class="upload-grid">
+                    {% for field_name in ['R1', 'R2', 'R3', 'R4', 'R5'] %} {%
+                    set finger_names = {'R1': 'Thumb', 'R2': 'Index', 'R3':
+                    'Middle', 'R4': 'Ring', 'R5': 'Pinky'} %}
+                    <div
+                      class="upload-item mb-3"
+                      data-finger="{{ field_name }}"
+                    >
+                      <label class="form-label">
+                        <i class="fas fa-fingerprint me-1"></i>
+                        {{ finger_names[field_name] }} ({{ field_name }})
+                      </label>
+                      {{ form[field_name](class="form-control file-input",
+                      accept=".jpg,.jpeg,.png") }}
+                      <div class="upload-preview mt-2" style="display: none">
+                        <img class="preview-image" src="" alt="Preview" />
+                        <button
+                          type="button"
+                          class="btn btn-sm btn-outline-danger remove-file"
+                        >
+                          <i class="fas fa-times"></i>
+                        </button>
+                      </div>
+                      {% if form[field_name].errors %}
+                      <div class="text-danger mt-1">
+                        {% for error in form[field_name].errors %}
+                        <small>{{ error }}</small>
+                        {% endfor %}
+                      </div>
+                      {% endif %}
+                    </div>
+                    {% endfor %}
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Remarks -->
+            <div class="mb-4">
+              <label for="{{ form.remarks.id }}" class="form-label">
+                <i class="fas fa-comment me-1"></i>Remarks (Optional)
+              </label>
+              {{ form.remarks(class="form-control", rows="3", placeholder="Any
+              additional notes or comments...") }} {% if form.remarks.errors %}
+              <div class="text-danger mt-1">
+                {% for error in form.remarks.errors %}
+                <small>{{ error }}</small>
+                {% endfor %}
+              </div>
+              {% endif %}
+            </div>
+
+            <!-- Upload Progress -->
+            <div id="uploadProgress" class="mb-3" style="display: none">
+              <div class="progress">
+                <div
+                  class="progress-bar progress-bar-striped progress-bar-animated"
+                  role="progressbar"
+                  style="width: 0%"
+                ></div>
+              </div>
+              <small class="text-muted mt-1">Processing uploads...</small>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="d-flex justify-content-between">
+              {{ form.back(class="btn btn-outline-secondary btn-lg") }} {{
+              form.submit(class="btn btn-success btn-lg", id="submitBtn") }}
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <!-- Upload Summary -->
+      <div class="mt-4">
+        <div class="card">
+          <div class="card-body">
+            <h6 class="text-primary mb-3">
+              <i class="fas fa-chart-bar me-2"></i>Upload Summary
+            </h6>
+            <div class="row text-center">
+              <div class="col-6">
+                <div class="upload-stat">
+                  <div class="stat-number" id="uploadedCount">0</div>
+                  <div class="stat-label">Uploaded</div>
+                </div>
+              </div>
+              <div class="col-6">
+                <div class="upload-stat">
+                  <div class="stat-number">10</div>
+                  <div class="stat-label">Total Fingers</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %} {% block extra_scripts %}
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-    const fileInputs = document.querySelectorAll('.file-input');
-    const submitBtn = document.getElementById('submitBtn');
-    const uploadedCountEl = document.getElementById('uploadedCount');
+  document.addEventListener("DOMContentLoaded", function () {
+    const fileInputs = document.querySelectorAll(".file-input");
+    const submitBtn = document.getElementById("submitBtn");
+    const uploadedCountEl = document.getElementById("uploadedCount");
     let uploadedCount = 0;
 
     // Handle file uploads and previews
-    fileInputs.forEach(input => {
-        input.addEventListener('change', function(e) {
-            const file = e.target.files[0];
-            const uploadItem = this.closest('.upload-item');
-            const preview = uploadItem.querySelector('.upload-preview');
-            const previewImg = uploadItem.querySelector('.preview-image');
-            const fingerPosition = uploadItem.dataset.finger;
+    fileInputs.forEach((input) => {
+      input.addEventListener("change", function (e) {
+        const file = e.target.files[0];
+        const uploadItem = this.closest(".upload-item");
+        const preview = uploadItem.querySelector(".upload-preview");
+        const previewImg = uploadItem.querySelector(".preview-image");
+        const fingerPosition = uploadItem.dataset.finger;
 
-            if (file) {
-                // Validate file type
-                const validTypes = ['image/jpeg', 'image/jpg', 'image/png'];
-                if (!validTypes.includes(file.type)) {
-                    alert('Please upload only JPG or PNG images.');
-                    this.value = '';
-                    return;
-                }
+        if (file) {
+          // Validate file type
+          const validTypes = ["image/jpeg", "image/jpg", "image/png"];
+          if (!validTypes.includes(file.type)) {
+            alert("Please upload only JPG or PNG images.");
+            this.value = "";
+            return;
+          }
 
-                // Validate file size (16MB)
-                if (file.size > 16 * 1024 * 1024) {
-                    alert('File size must be less than 16MB.');
-                    this.value = '';
-                    return;
-                }
+          // Validate file size (16MB)
+          if (file.size > 16 * 1024 * 1024) {
+            alert("File size must be less than 16MB.");
+            this.value = "";
+            return;
+          }
 
-                // Show preview
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    previewImg.src = e.target.result;
-                    preview.style.display = 'block';
-                    
-                    // Update finger circle in SVG
-                    const fingerCircle = document.querySelector(`[data-finger="${fingerPosition}"]`);
-                    if (fingerCircle) {
-                        fingerCircle.setAttribute('fill', '#28a745');
-                        fingerCircle.setAttribute('stroke', '#1e7e34');
-                    }
-                    
-                    updateUploadCount();
-                };
-                reader.readAsDataURL(file);
-                
-            } else {
-                // Hide preview
-                preview.style.display = 'none';
-                
-                // Reset finger circle
-                const fingerCircle = document.querySelector(`[data-finger="${fingerPosition}"]`);
-                if (fingerCircle) {
-                    fingerCircle.setAttribute('fill', '#e9ecef');
-                    fingerCircle.setAttribute('stroke', '#6c757d');
-                }
-                
-                updateUploadCount();
+          // Show preview
+          const reader = new FileReader();
+          reader.onload = function (e) {
+            previewImg.src = e.target.result;
+            preview.style.display = "block";
+
+            // Update finger circle in SVG
+            const handSvg = uploadItem
+              .closest(".hand-section")
+              .querySelector(".hand-svg");
+            const fingerCircle = handSvg.querySelector(
+              `[data-finger="${fingerPosition}"]`
+            );
+            if (fingerCircle) {
+              fingerCircle.setAttribute("fill", "#28a745");
+              fingerCircle.setAttribute("stroke", "#1e7e34");
             }
-        });
+
+            updateUploadCount();
+          };
+          reader.readAsDataURL(file);
+        } else {
+          // Hide preview
+          preview.style.display = "none";
+
+          // Reset finger circle
+          const handSvg = uploadItem
+            .closest(".hand-section")
+            .querySelector(".hand-svg");
+          const fingerCircle = handSvg.querySelector(
+            `[data-finger="${fingerPosition}"]`
+          );
+          if (fingerCircle) {
+            fingerCircle.setAttribute("fill", "#e9ecef");
+            fingerCircle.setAttribute("stroke", "#6c757d");
+          }
+
+          updateUploadCount();
+        }
+      });
     });
 
     // Remove file functionality
-    document.addEventListener('click', function(e) {
-        if (e.target.classList.contains('remove-file') || e.target.closest('.remove-file')) {
-            const uploadItem = e.target.closest('.upload-item');
-            const fileInput = uploadItem.querySelector('.file-input');
-            const preview = uploadItem.querySelector('.upload-preview');
-            const fingerPosition = uploadItem.dataset.finger;
-            
-            fileInput.value = '';
-            preview.style.display = 'none';
-            
-            // Reset finger circle
-            const fingerCircle = document.querySelector(`[data-finger="${fingerPosition}"]`);
-            if (fingerCircle) {
-                fingerCircle.setAttribute('fill', '#e9ecef');
-                fingerCircle.setAttribute('stroke', '#6c757d');
-            }
-            
-            updateUploadCount();
+    document.addEventListener("click", function (e) {
+      if (
+        e.target.classList.contains("remove-file") ||
+        e.target.closest(".remove-file")
+      ) {
+        const uploadItem = e.target.closest(".upload-item");
+        const fileInput = uploadItem.querySelector(".file-input");
+        const preview = uploadItem.querySelector(".upload-preview");
+        const fingerPosition = uploadItem.dataset.finger;
+
+        fileInput.value = "";
+        preview.style.display = "none";
+
+        // Reset finger circle
+        const handSvg = uploadItem
+          .closest(".hand-section")
+          .querySelector(".hand-svg");
+        const fingerCircle = handSvg.querySelector(
+          `[data-finger="${fingerPosition}"]`
+        );
+        if (fingerCircle) {
+          fingerCircle.setAttribute("fill", "#e9ecef");
+          fingerCircle.setAttribute("stroke", "#6c757d");
         }
+
+        updateUploadCount();
+      }
     });
 
     function updateUploadCount() {
-        uploadedCount = Array.from(fileInputs).filter(input => input.files.length > 0).length;
-        uploadedCountEl.textContent = uploadedCount;
-        
-        // Enable/disable submit button
-        if (uploadedCount > 0) {
-            submitBtn.disabled = false;
-            submitBtn.innerHTML = '<i class="fas fa-check me-2"></i>Submit Application';
-        } else {
-            submitBtn.disabled = true;
-            submitBtn.innerHTML = '<i class="fas fa-exclamation-triangle me-2"></i>Upload at least 1 fingerprint';
-        }
+      uploadedCount = Array.from(fileInputs).filter(
+        (input) => input.files.length > 0
+      ).length;
+      uploadedCountEl.textContent = uploadedCount;
+
+      // Enable/disable submit button
+      if (uploadedCount > 0) {
+        submitBtn.disabled = false;
+        submitBtn.innerHTML =
+          '<i class="fas fa-check me-2"></i>Submit Application';
+      } else {
+        submitBtn.disabled = true;
+        submitBtn.innerHTML =
+          '<i class="fas fa-exclamation-triangle me-2"></i>Upload at least 1 fingerprint';
+      }
     }
 
     // Form submission with progress
-    document.getElementById('fingerprintForm').addEventListener('submit', function(e) {
+    document
+      .getElementById("fingerprintForm")
+      .addEventListener("submit", function (e) {
         if (uploadedCount === 0) {
-            e.preventDefault();
-            alert('Please upload at least one fingerprint image.');
-            return false;
+          e.preventDefault();
+          alert("Please upload at least one fingerprint image.");
+          return false;
         }
-        
+
         // Show progress
-        const progressEl = document.getElementById('uploadProgress');
-        const progressBar = progressEl.querySelector('.progress-bar');
-        
-        progressEl.style.display = 'block';
+        const progressEl = document.getElementById("uploadProgress");
+        const progressBar = progressEl.querySelector(".progress-bar");
+
+        progressEl.style.display = "block";
         submitBtn.disabled = true;
-        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Submitting...';
-        
+        submitBtn.innerHTML =
+          '<i class="fas fa-spinner fa-spin me-2"></i>Submitting...';
+
         // Simulate progress (actual progress would need server-side implementation)
         let progress = 0;
         const progressInterval = setInterval(() => {
-            progress += 10;
-            progressBar.style.width = progress + '%';
-            
-            if (progress >= 90) {
-                clearInterval(progressInterval);
-            }
+          progress += 10;
+          progressBar.style.width = progress + "%";
+
+          if (progress >= 90) {
+            clearInterval(progressInterval);
+          }
         }, 200);
-    });
+      });
 
     // Initial count update
     updateUploadCount();
-});
+  });
 </script>
 {% endblock %}

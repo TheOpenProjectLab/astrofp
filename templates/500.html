@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+
+{% block title %}Server Error{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8 text-center">
+            <div class="error-page-card card shadow-lg">
+                <div class="card-body p-5">
+                    <h1 class="display-1 text-danger fw-bold">500</h1>
+                    <h3 class="card-title mt-3 mb-4">
+                        <i class="fas fa-server me-2"></i>
+                        Internal Server Error
+                    </h3>
+                    <p class="card-text text-muted">
+                        We seem to be experiencing some technical difficulties. Our team has been notified and is working on a solution. Please try again later.
+                    </p>
+                    <a href="{{ url_for('index') }}" class="btn btn-primary btn-lg mt-4">
+                        <i class="fas fa-home me-2"></i>
+                        Go to Homepage
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<style>
+    .error-page-card {
+        border: none;
+        border-top: 5px solid #dc3545;
+    }
+</style>
+{% endblock %}

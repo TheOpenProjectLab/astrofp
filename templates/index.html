@@ -2,6 +2,96 @@
 
 {% block title %}Welcome - Astrological Fingerprint Collection{% endblock %}
 
+{% block extra_head %}
+<style>
+    /* Yellow-Orange Theme Overrides */
+    :root {
+        --brand-primary: #FF8C00; /* Dark Orange */
+        --brand-secondary: #FFA500; /* Orange */
+        --brand-accent: #FFD700; /* Gold */
+        --hero-bg-start: #FFF8E1; /* Light Yellow Cream */
+        --hero-bg-end: #FFE0B2; /* Light Orange */
+    }
+
+    /* Apply theme to the background */
+    .hero-section {
+        background: linear-gradient(135deg, var(--hero-bg-start), var(--hero-bg-end));
+    }
+
+    /* Update Bootstrap default colors */
+    .btn-primary {
+        background-color: var(--brand-primary);
+        border-color: var(--brand-primary);
+    }
+    .btn-primary:hover {
+        background-color: #E67E00;
+        border-color: #E67E00;
+    }
+    .bg-primary {
+        background-color: var(--brand-primary) !important;
+    }
+    .text-primary, h1.text-info, h2.text-primary, h6.text-primary {
+        color: var(--brand-primary) !important;
+    }
+    .text-info {
+        color: var(--brand-secondary) !important;
+    }
+
+    /* Update specific icons in the 3-step process */
+    .step-card .fa-user.text-primary { color: var(--brand-primary) !important; }
+    .step-card .fa-hand-paper.text-info { color: var(--brand-secondary) !important; }
+    .step-card .fa-download.text-success { color: var(--brand-accent) !important; }
+
+    /* Theme for the Zodiac animation */
+    .astrology-visual .fa-hand-paper.text-primary {
+         color: var(--brand-secondary) !important;
+    }
+    .zodiac-circle {
+        border-color: var(--brand-accent);
+    }
+    .zodiac-symbol {
+        color: var(--brand-primary);
+        background-color: rgba(255, 255, 255, 0.7);
+        border-radius: 5px;
+    }
+
+    /* Unchanged Original Animation CSS */
+    .zodiac-circle {
+        position: relative;
+        width: 300px;
+        height: 300px;
+        border-radius: 50%;
+        border: 2px dashed;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        animation: spin 30s linear infinite;
+    }
+    .zodiac-symbols {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+    }
+    .zodiac-symbol {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%) rotate(calc(30deg * var(--i))) translateX(150px) rotate(calc(-30deg * var(--i)));
+        font-size: 1.5rem;
+        padding: 5px;
+        width: 35px;
+        height: 35px;
+        text-align: center;
+        line-height: 25px;
+    }
+    @keyframes spin {
+        from { transform: rotate(0deg); }
+        to { transform: rotate(360deg); }
+    }
+</style>
+{% endblock %}
+
+
 {% block content %}
 <!-- Hero Section -->
 <section class="hero-section">
@@ -9,7 +99,7 @@
         <div class="row align-items-center min-vh-100">
             <div class="col-lg-6">
                 <div class="hero-content">
-                    <h1 class="display-4 fw-bold text-primary mb-4">
+                    <h1 class="display-4 fw-bold text-info mb-4">
                         <i class="fas fa-hand-paper me-3"></i>
                         Astrological Fingerprint Analysis
                     </h1>
@@ -186,3 +276,4 @@
     </div>
 </section>
 {% endblock %}
+

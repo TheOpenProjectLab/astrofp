@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+
+{% block title %}Page Not Found{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8 text-center">
+            <div class="error-page-card card shadow-lg">
+                <div class="card-body p-5">
+                    <h1 class="display-1 text-primary fw-bold">404</h1>
+                    <h3 class="card-title mt-3 mb-4">
+                        <i class="fas fa-ghost me-2"></i>
+                        Oops! Page Not Found
+                    </h3>
+                    <p class="card-text text-muted">
+                        The page you are looking for might have been moved, renamed, or is temporarily unavailable.
+                        Let's get you back on track.
+                    </p>
+                    <a href="{{ url_for('index') }}" class="btn btn-primary btn-lg mt-4">
+                        <i class="fas fa-home me-2"></i>
+                        Go to Homepage
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<style>
+    .error-page-card {
+        border: none;
+        border-top: 5px solid #0d6efd;
+    }
+</style>
+{% endblock %}

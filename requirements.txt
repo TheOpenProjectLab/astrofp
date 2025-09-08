@@ -1,0 +1,9 @@
+Flask
+Flask-SQLAlchemy
+SQLAlchemy
+Flask-WTF
+WTForms
+Werkzeug
+Pillow
+reportlab
+email-validator

@@ -3,6 +3,7 @@ from datetime import datetime
 import uuid
 
 class Client(db.Model):
+    """Represents a client who submits their personal and fingerprint data."""
     id = db.Column(db.Integer, primary_key=True)
     session_id = db.Column(db.String(36), unique=True, nullable=False, default=lambda: str(uuid.uuid4()))
     
@@ -21,7 +22,7 @@ class Client(db.Model):
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     remarks = db.Column(db.Text)
     
-    # Relationships
+    # Establishes a one-to-many relationship with fingerprints
     fingerprints = db.relationship('Fingerprint', backref='client', lazy=True, cascade='all, delete-orphan')
     
     def __repr__(self):
@@ -29,17 +30,19 @@ class Client(db.Model):
     
     @property
     def full_name(self):
-        name_parts = [self.title, self.first_name, self.middle_name, self.last_name]
-        return ' '.join(part for part in name_parts if part)
+        """Returns the client's full name, constructed from its parts."""
+        parts = [self.title, self.first_name, self.middle_name, self.last_name]
+        return ' '.join(part for part in parts if part)
 
 class Fingerprint(db.Model):
+    """Represents a single uploaded fingerprint image file."""
     id = db.Column(db.Integer, primary_key=True)
     client_id = db.Column(db.Integer, db.ForeignKey('client.id'), nullable=False)
-    finger_position = db.Column(db.String(5), nullable=False)  # L1-L5, R1-R5
+    finger_position = db.Column(db.String(5), nullable=False)  # e.g., L1, R3
     filename = db.Column(db.String(255), nullable=False)
     original_filename = db.Column(db.String(255), nullable=False)
     file_path = db.Column(db.String(500), nullable=False)
-    file_size = db.Column(db.Integer)
+    file_size = db.Column(db.Integer) # in bytes
     uploaded_at = db.Column(db.DateTime, default=datetime.utcnow)
     
     def __repr__(self):
