@@ -7,3 +7,4 @@ Werkzeug
 Pillow
 reportlab
 email-validator
+gunicorn
