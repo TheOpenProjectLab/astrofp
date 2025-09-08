@@ -1,0 +1,568 @@
+/* Custom CSS for Astrology Fingerprint Collection App */
+
+:root {
+    --primary-color: #2c3e50;
+    --secondary-color: #3498db;
+    --accent-color: #e74c3c;
+    --success-color: #27ae60;
+    --warning-color: #f39c12;
+    --info-color: #16a085;
+    --light-bg: #f8f9fa;
+    --dark-bg: #2c3e50;
+    --text-muted: #6c757d;
+    --border-color: #dee2e6;
+    --shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+    --shadow-lg: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+}
+
+/* Global Styles */
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background-attachment: fixed;
+    min-height: 100vh;
+}
+
+/* Navigation */
+.navbar-brand {
+    font-weight: 600;
+    font-size: 1.25rem;
+}
+
+.navbar-nav .nav-link {
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+.navbar-nav .nav-link:hover {
+    transform: translateY(-1px);
+    color: #fff !important;
+}
+
+/* Hero Section */
+.hero-section {
+    background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
+    backdrop-filter: blur(10px);
+}
+
+.hero-content h1 {
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* Feature Items */
+.feature-item {
+    display: flex;
+    align-items: center;
+    padding: 0.5rem 0;
+    font-weight: 500;
+}
+
+/* Astrology Visual */
+.astrology-visual {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 400px;
+}
+
+.zodiac-circle {
+    position: relative;
+    width: 300px;
+    height: 300px;
+    border-radius: 50%;
+    border: 3px solid rgba(52, 152, 219, 0.3);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    animation: rotate 30s linear infinite;
+}
+
+.zodiac-symbols {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+}
+
+.zodiac-symbol {
+    position: absolute;
+    font-size: 24px;
+    font-weight: bold;
+    color: var(--secondary-color);
+    transform-origin: 150px 150px;
+    transform: rotate(calc(var(--i) * 30deg)) translateX(120px) rotate(calc(var(--i) * -30deg));
+    animation: counter-rotate 30s linear infinite;
+}
+
+@keyframes rotate {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+@keyframes counter-rotate {
+    from { transform: rotate(calc(var(--i) * 30deg)) translateX(120px) rotate(calc(var(--i) * -30deg)); }
+    to { transform: rotate(calc(var(--i) * 30deg + 360deg)) translateX(120px) rotate(calc(var(--i) * -30deg - 360deg)); }
+}
+
+/* Process Steps */
+.step-card {
+    background: white;
+    padding: 2rem;
+    border-radius: 15px;
+    box-shadow: var(--shadow-lg);
+    transition: all 0.3s ease;
+    height: 100%;
+}
+
+.step-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 1rem 2rem rgba(0, 0, 0, 0.2);
+}
+
+.step-number {
+    display: inline-block;
+    width: 50px;
+    height: 50px;
+    background: var(--secondary-color);
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    font-size: 1.2rem;
+    margin-bottom: 1rem;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+/* Progress Indicator */
+.progress-indicator {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 2rem;
+}
+
+.step-progress {
+    display: flex;
+    align-items: center;
+    max-width: 600px;
+    width: 100%;
+}
+
+.step {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    flex: 1;
+    position: relative;
+}
+
+.step .step-number {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background-color: var(--border-color);
+    color: var(--text-muted);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    margin-bottom: 0.5rem;
+    transition: all 0.3s ease;
+    z-index: 2;
+}
+
+.step.active .step-number {
+    background-color: var(--secondary-color);
+    color: white;
+}
+
+.step.completed .step-number {
+    background-color: var(--success-color);
+    color: white;
+}
+
+.step-title {
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: var(--text-muted);
+    text-align: center;
+}
+
+.step.active .step-title {
+    color: var(--secondary-color);
+    font-weight: 600;
+}
+
+.step.completed .step-title {
+    color: var(--success-color);
+    font-weight: 600;
+}
+
+.step-connector {
+    height: 2px;
+    background-color: var(--border-color);
+    flex: 1;
+    margin: 0 1rem;
+    position: relative;
+    top: -20px;
+}
+
+.step-connector.completed {
+    background-color: var(--success-color);
+}
+
+/* Form Styles */
+.card {
+    border: none;
+    border-radius: 15px;
+    overflow: hidden;
+    box-shadow: var(--shadow-lg);
+}
+
+.card-header {
+    border-bottom: none;
+    padding: 1.5rem;
+}
+
+.form-label.required::after {
+    content: " *";
+    color: var(--accent-color);
+}
+
+.form-control, .form-select {
+    border-radius: 8px;
+    border: 1px solid var(--border-color);
+    transition: all 0.3s ease;
+}
+
+.form-control:focus, .form-select:focus {
+    border-color: var(--secondary-color);
+    box-shadow: 0 0 0 0.2rem rgba(52, 152, 219, 0.25);
+}
+
+.is-valid {
+    border-color: var(--success-color) !important;
+}
+
+.is-invalid {
+    border-color: var(--accent-color) !important;
+}
+
+/* Hand Visualizations */
+.hand-section {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 15px;
+    padding: 1.5rem;
+}
+
+.hand-visual {
+    display: flex;
+    justify-content: center;
+    margin: 1rem 0;
+}
+
+.hand-svg {
+    max-width: 200px;
+    height: 250px;
+    background: white;
+    border-radius: 10px;
+    padding: 10px;
+    box-shadow: var(--shadow);
+}
+
+.finger-circle {
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.finger-circle:hover {
+    transform: scale(1.1);
+}
+
+.finger-label {
+    font-size: 12px;
+    font-weight: bold;
+    fill: #333;
+    pointer-events: none;
+}
+
+/* Upload Styles */
+.upload-grid .upload-item {
+    background: rgba(255, 255, 255, 0.8);
+    border-radius: 8px;
+    padding: 1rem;
+    border: 2px dashed var(--border-color);
+    transition: all 0.3s ease;
+}
+
+.upload-item:hover {
+    border-color: var(--secondary-color);
+    background: rgba(255, 255, 255, 0.9);
+}
+
+.upload-item.has-file {
+    border-color: var(--success-color);
+    border-style: solid;
+}
+
+.upload-preview {
+    position: relative;
+    text-align: center;
+}
+
+.preview-image {
+    max-width: 100px;
+    max-height: 100px;
+    border-radius: 8px;
+    box-shadow: var(--shadow);
+}
+
+.remove-file {
+    position: absolute;
+    top: -5px;
+    right: calc(50% - 50px);
+    border-radius: 50%;
+    width: 25px;
+    height: 25px;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Statistics */
+.stat-card, .upload-stat {
+    text-align: center;
+    padding: 1rem;
+}
+
+.stat-number {
+    font-size: 2rem;
+    font-weight: bold;
+    margin-bottom: 0.5rem;
+}
+
+.stat-label {
+    font-size: 0.9rem;
+    color: var(--text-muted);
+    font-weight: 500;
+}
+
+/* Success Page Styles */
+.client-summary {
+    background: var(--light-bg);
+    border-radius: 10px;
+    padding: 1.5rem;
+}
+
+.zodiac-display {
+    text-align: center;
+}
+
+.zodiac-icon {
+    font-size: 4rem;
+    margin-bottom: 0.5rem;
+    display: block;
+}
+
+/* PDF Download Section */
+.pdf-download {
+    background: linear-gradient(135deg, rgba(39, 174, 96, 0.1) 0%, rgba(46, 204, 113, 0.1) 100%);
+    border-radius: 15px;
+    padding: 2rem;
+    margin: 1.5rem 0;
+}
+
+/* Button Enhancements */
+.btn {
+    border-radius: 8px;
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+.btn-lg {
+    padding: 0.75rem 2rem;
+}
+
+.btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+    border: none;
+}
+
+.btn-success {
+    background: linear-gradient(135deg, #27ae60 0%, #219a52 100%);
+    border: none;
+}
+
+.btn-outline-secondary {
+    border-color: var(--text-muted);
+    color: var(--text-muted);
+}
+
+.btn-outline-secondary:hover {
+    background-color: var(--text-muted);
+    border-color: var(--text-muted);
+}
+
+/* Alerts */
+.alert {
+    border: none;
+    border-radius: 10px;
+    box-shadow: var(--shadow);
+}
+
+/* Loading States */
+.progress {
+    height: 8px;
+    border-radius: 4px;
+}
+
+.progress-bar {
+    background: linear-gradient(90deg, #3498db, #2980b9);
+}
+
+/* Footer */
+footer {
+    margin-top: auto;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .hero-section {
+        text-align: center;
+    }
+    
+    .astrology-visual {
+        min-height: 250px;
+    }
+    
+    .zodiac-circle {
+        width: 200px;
+        height: 200px;
+    }
+    
+    .zodiac-symbol {
+        font-size: 18px;
+        transform: rotate(calc(var(--i) * 30deg)) translateX(80px) rotate(calc(var(--i) * -30deg));
+    }
+    
+    .hand-svg {
+        max-width: 150px;
+        height: 200px;
+    }
+    
+    .step-progress {
+        flex-direction: column;
+    }
+    
+    .step {
+        margin-bottom: 1rem;
+    }
+    
+    .step-connector {
+        display: none;
+    }
+}
+
+@media (max-width: 576px) {
+    .container {
+        padding-left: 1rem;
+        padding-right: 1rem;
+    }
+    
+    .card-body {
+        padding: 1rem;
+    }
+    
+    .btn-lg {
+        padding: 0.5rem 1.5rem;
+        font-size: 1rem;
+    }
+}
+
+/* Animation Classes */
+.fade-in {
+    animation: fadeIn 0.5s ease-in;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.slide-up {
+    animation: slideUp 0.6s ease-out;
+}
+
+@keyframes slideUp {
+    from { opacity: 0; transform: translateY(30px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Dark mode compatibility */
+@media (prefers-color-scheme: dark) {
+    .card {
+        background-color: rgba(255, 255, 255, 0.95);
+    }
+    
+    .hand-section {
+        background: rgba(255, 255, 255, 0.1);
+    }
+}
+
+/* Print styles for PDF preview */
+@media print {
+    .navbar, .btn, .modal, footer {
+        display: none !important;
+    }
+    
+    body {
+        background: white !important;
+    }
+    
+    .card {
+        box-shadow: none;
+        border: 1px solid #ccc;
+    }
+}
+
+/* Accessibility improvements */
+.btn:focus, .form-control:focus, .form-select:focus {
+    outline: 2px solid var(--secondary-color);
+    outline-offset: 2px;
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+    .zodiac-circle {
+        border-color: #000;
+    }
+    
+    .zodiac-symbol {
+        color: #000;
+        font-weight: 900;
+    }
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+    * {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+    
+    .zodiac-circle {
+        animation: none;
+    }
+    
+    .zodiac-symbol {
+        animation: none;
+    }
+}

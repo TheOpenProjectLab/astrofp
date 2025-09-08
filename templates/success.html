@@ -1,0 +1,305 @@
+{% extends "base.html" %}
+
+{% block title %}Submission Complete - Astrological Fingerprint Collection{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <!-- Progress Indicator -->
+            <div class="progress-indicator mb-5">
+                <div class="step-progress">
+                    <div class="step completed">
+                        <div class="step-number"><i class="fas fa-check"></i></div>
+                        <div class="step-title">Personal Details</div>
+                    </div>
+                    <div class="step-connector completed"></div>
+                    <div class="step completed">
+                        <div class="step-number"><i class="fas fa-check"></i></div>
+                        <div class="step-title">Fingerprints</div>
+                    </div>
+                    <div class="step-connector completed"></div>
+                    <div class="step active completed">
+                        <div class="step-number"><i class="fas fa-check"></i></div>
+                        <div class="step-title">Complete</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Success Card -->
+            <div class="card shadow-lg border-success">
+                <div class="card-header bg-success text-white text-center">
+                    <i class="fas fa-check-circle fa-3x mb-3"></i>
+                    <h3 class="mb-0">Application Submitted Successfully!</h3>
+                </div>
+                
+                <div class="card-body">
+                    <!-- Client Summary -->
+                    <div class="client-summary mb-4">
+                        <div class="row">
+                            <div class="col-md-8">
+                                <h5 class="text-primary">
+                                    <i class="fas fa-user me-2"></i>Client Information
+                                </h5>
+                                <div class="client-details">
+                                    <p class="mb-1"><strong>Name:</strong> {{ client.full_name }}</p>
+                                    <p class="mb-1"><strong>Email:</strong> {{ client.email }}</p>
+                                    <p class="mb-1"><strong>Mobile:</strong> {{ client.mobile_number }}</p>
+                                    <p class="mb-1"><strong>Date of Birth:</strong> {{ client.date_of_birth.strftime('%B %d, %Y') }}</p>
+                                    <p class="mb-1"><strong>Age:</strong> {{ age }} years</p>
+                                    <p class="mb-1"><strong>Zodiac Sign:</strong> {{ zodiac_sign }}</p>
+                                </div>
+                            </div>
+                            <div class="col-md-4 text-center">
+                                <div class="zodiac-display">
+                                    <div class="zodiac-icon">{{ zodiac_sign.split(' ')[1] if ' ' in zodiac_sign else '⭐' }}</div>
+                                    <small class="text-muted">{{ zodiac_sign.split(' ')[0] if ' ' in zodiac_sign else zodiac_sign }}</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <hr>
+
+                    <!-- Submission Summary -->
+                    <div class="submission-summary mb-4">
+                        <h5 class="text-primary">
+                            <i class="fas fa-fingerprint me-2"></i>Submission Summary
+                        </h5>
+                        <div class="row text-center">
+                            <div class="col-md-4">
+                                <div class="stat-card">
+                                    <div class="stat-number text-success">{{ fingerprint_count }}</div>
+                                    <div class="stat-label">Fingerprints Uploaded</div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="stat-card">
+                                    <div class="stat-number text-info">{{ client.created_at.strftime('%H:%M') }}</div>
+                                    <div class="stat-label">Submission Time</div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="stat-card">
+                                    <div class="stat-number text-warning">{{ client.created_at.strftime('%m/%d/%Y') }}</div>
+                                    <div class="stat-label">Submission Date</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Session ID -->
+                    <div class="session-info mb-4">
+                        <div class="alert alert-light">
+                            <h6 class="alert-heading">
+                                <i class="fas fa-id-badge me-2"></i>Session Reference
+                            </h6>
+                            <p class="mb-0">
+                                <strong>Session ID:</strong> 
+                                <code class="text-primary">{{ client.session_id }}</code>
+                                <button class="btn btn-sm btn-outline-secondary ms-2" onclick="copyToClipboard('{{ client.session_id }}')">
+                                    <i class="fas fa-copy"></i>
+                                </button>
+                            </p>
+                            <small class="text-muted">Keep this reference number for your records</small>
+                        </div>
+                    </div>
+
+                    <!-- PDF Download Section -->
+                    <div class="pdf-download text-center">
+                        <h5 class="text-primary mb-3">
+                            <i class="fas fa-file-pdf me-2"></i>Your Astrological Report
+                        </h5>
+                        <p class="text-muted mb-4">
+                            Your comprehensive astrological profile has been generated including all submitted 
+                            fingerprints and personal details.
+                        </p>
+                        
+                        <div class="download-actions">
+                            <a href="{{ url_for('download_pdf', client_id=client.id) }}" 
+                               class="btn btn-success btn-lg me-3"
+                               onclick="trackDownload()">
+                                <i class="fas fa-download me-2"></i>
+                                Download PDF Report
+                            </a>
+                            
+                            <button class="btn btn-outline-primary btn-lg" 
+                                    data-bs-toggle="modal" 
+                                    data-bs-target="#reportPreviewModal">
+                                <i class="fas fa-eye me-2"></i>
+                                Preview Report
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Additional Actions -->
+                    <hr class="my-4">
+                    
+                    <div class="additional-actions text-center">
+                        <h6 class="text-muted mb-3">What's Next?</h6>
+                        <div class="row">
+                            <div class="col-md-6 mb-2">
+                                <a href="{{ url_for('new_session') }}" class="btn btn-outline-secondary w-100">
+                                    <i class="fas fa-plus me-2"></i>
+                                    Start New Session
+                                </a>
+                            </div>
+                            <div class="col-md-6 mb-2">
+                                <a href="{{ url_for('index') }}" class="btn btn-outline-primary w-100">
+                                    <i class="fas fa-home me-2"></i>
+                                    Back to Home
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Important Notes -->
+            <div class="mt-4">
+                <div class="alert alert-info">
+                    <h6 class="alert-heading">
+                        <i class="fas fa-info-circle me-2"></i>Important Notes
+                    </h6>
+                    <ul class="mb-0">
+                        <li>Your PDF report contains all submitted information and fingerprint images</li>
+                        <li>Download your report now - session data is not permanently stored</li>
+                        <li>Keep your Session ID for reference if you need support</li>
+                        <li>For privacy and security, your data will be automatically deleted after this session</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Report Preview Modal -->
+<div class="modal fade" id="reportPreviewModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title">
+                    <i class="fas fa-file-pdf me-2"></i>
+                    Report Preview
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="report-preview">
+                    <h6 class="text-primary">Your report includes:</h6>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <ul class="list-unstyled">
+                                <li><i class="fas fa-check text-success me-2"></i>Complete personal information</li>
+                                <li><i class="fas fa-check text-success me-2"></i>Birth details and zodiac analysis</li>
+                                <li><i class="fas fa-check text-success me-2"></i>Contact information</li>
+                            </ul>
+                        </div>
+                        <div class="col-md-6">
+                            <ul class="list-unstyled">
+                                <li><i class="fas fa-check text-success me-2"></i>{{ fingerprint_count }} fingerprint images</li>
+                                <li><i class="fas fa-check text-success me-2"></i>Submission timestamp</li>
+                                <li><i class="fas fa-check text-success me-2"></i>Session reference</li>
+                            </ul>
+                        </div>
+                    </div>
+                    
+                    <div class="mt-3 p-3 bg-light rounded">
+                        <h6>Report Format:</h6>
+                        <p class="mb-0 text-muted">
+                            Professional PDF document with organized sections, embedded images, 
+                            and formatted tables for easy reading and printing.
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <a href="{{ url_for('download_pdf', client_id=client.id) }}" 
+                   class="btn btn-success"
+                   onclick="trackDownload()">
+                    <i class="fas fa-download me-2"></i>
+                    Download Report
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+function copyToClipboard(text) {
+    navigator.clipboard.writeText(text).then(function() {
+        // Show temporary success message
+        const btn = event.target.closest('button');
+        const originalHTML = btn.innerHTML;
+        btn.innerHTML = '<i class="fas fa-check text-success"></i>';
+        
+        setTimeout(() => {
+            btn.innerHTML = originalHTML;
+        }, 2000);
+    }).catch(function(err) {
+        console.error('Failed to copy: ', err);
+    });
+}
+
+function trackDownload() {
+    // Track download event (can be extended with analytics)
+    console.log('PDF download initiated at:', new Date());
+}
+
+// Auto-scroll to download section after page load
+document.addEventListener('DOMContentLoaded', function() {
+    setTimeout(() => {
+        const downloadSection = document.querySelector('.pdf-download');
+        if (downloadSection) {
+            downloadSection.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+    }, 1000);
+});
+
+// Confetti effect on successful submission
+document.addEventListener('DOMContentLoaded', function() {
+    // Simple confetti animation
+    function createConfetti() {
+        const confetti = document.createElement('div');
+        confetti.className = 'confetti';
+        confetti.style.left = Math.random() * 100 + '%';
+        confetti.style.backgroundColor = ['#007bff', '#28a745', '#ffc107', '#dc3545', '#6610f2'][Math.floor(Math.random() * 5)];
+        document.body.appendChild(confetti);
+        
+        setTimeout(() => {
+            confetti.remove();
+        }, 3000);
+    }
+    
+    // Create confetti particles
+    for (let i = 0; i < 20; i++) {
+        setTimeout(() => createConfetti(), i * 100);
+    }
+});
+</script>
+
+<style>
+.confetti {
+    position: fixed;
+    width: 10px;
+    height: 10px;
+    top: -10px;
+    z-index: 1000;
+    animation: confetti-fall 3s linear forwards;
+}
+
+@keyframes confetti-fall {
+    0% {
+        transform: translateY(-100vh) rotate(0deg);
+        opacity: 1;
+    }
+    100% {
+        transform: translateY(100vh) rotate(360deg);
+        opacity: 0;
+    }
+}
+</style>
+{% endblock %}
