@@ -1,0 +1,31 @@
+# Ignore uv files - use requirements.txt instead
+uv.lock
+pyproject.toml
+poetry.lock
+
+# Python cache
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual environments
+env/
+venv/
+ENV/
+.venv
+
+# Local development
+*.db
+*.sqlite
+*.sqlite3
+.env
+.env.local
+
+# Uploads (ephemeral on Vercel)
+static/uploads/*
+
+# OS files
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
