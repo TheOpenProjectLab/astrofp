@@ -26,16 +26,21 @@ Astrological Fingerprint Collection{% endblock %} {% block content %}
         <div class="step-progress">
           <div class="step completed">
             <div class="step-number"><i class="fas fa-check"></i></div>
+            <div class="step-title">Face Capture</div>
+          </div>
+          <div class="step-connector completed"></div>
+          <div class="step completed">
+            <div class="step-number"><i class="fas fa-check"></i></div>
             <div class="step-title">Personal Details</div>
           </div>
           <div class="step-connector completed"></div>
           <div class="step active">
-            <div class="step-number">2</div>
+            <div class="step-number">3</div>
             <div class="step-title">Fingerprints</div>
           </div>
           <div class="step-connector"></div>
           <div class="step">
-            <div class="step-number">3</div>
+            <div class="step-number">4</div>
             <div class="step-title">Complete</div>
           </div>
         </div>
@@ -74,7 +79,7 @@ Astrological Fingerprint Collection{% endblock %} {% block content %}
         <div class="card-header bg-primary text-white">
           <h4 class="mb-0">
             <i class="fas fa-hand-paper me-2"></i>
-            Step 2: Fingerprint Upload
+            Step 3: Fingerprint Upload
           </h4>
           <small
             >Upload high-resolution images of all 10 fingerprints (JPG/PNG
@@ -481,14 +486,12 @@ Astrological Fingerprint Collection{% endblock %} {% block content %}
             return;
           }
 
-          // Validate file size (16MB)
           if (file.size > 16 * 1024 * 1024) {
             alert("File size must be less than 16MB.");
             this.value = "";
             return;
           }
 
-          // Show preview
           const reader = new FileReader();
           reader.onload = function (e) {
             previewImg.src = e.target.result;

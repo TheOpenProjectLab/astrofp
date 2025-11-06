@@ -11,6 +11,11 @@
                 <div class="step-progress">
                     <div class="step completed">
                         <div class="step-number"><i class="fas fa-check"></i></div>
+                        <div class="step-title">Face Capture</div>
+                    </div>
+                    <div class="step-connector completed"></div>
+                    <div class="step completed">
+                        <div class="step-number"><i class="fas fa-check"></i></div>
                         <div class="step-title">Personal Details</div>
                     </div>
                     <div class="step-connector completed"></div>
@@ -185,26 +190,25 @@
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
             </div>
             <div class="modal-body">
-                <div class="report-preview">
-                    <h6 class="text-primary">Your report includes:</h6>
-                    <div class="row">
-                        <div class="col-md-6">
-                            <ul class="list-unstyled">
-                                <li><i class="fas fa-check text-success me-2"></i>Complete personal information</li>
-                                <li><i class="fas fa-check text-success me-2"></i>Birth details and zodiac analysis</li>
-                                <li><i class="fas fa-check text-success me-2"></i>Contact information</li>
-                            </ul>
-                        </div>
-                        <div class="col-md-6">
-                            <ul class="list-unstyled">
-                                <li><i class="fas fa-check text-success me-2"></i>{{ fingerprint_count }} fingerprint images</li>
-                                <li><i class="fas fa-check text-success me-2"></i>Submission timestamp</li>
-                                <li><i class="fas fa-check text-success me-2"></i>Session reference</li>
-                            </ul>
-                        </div>
-                    </div>
-                    
-                    <div class="mt-3 p-3 bg-light rounded">
+                    <div class="report-preview">
+                        <h6 class="text-primary">Your report includes:</h6>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <ul class="list-unstyled">
+                                    <li><i class="fas fa-check text-success me-2"></i>Your captured photo</li>
+                                    <li><i class="fas fa-check text-success me-2"></i>Complete personal information</li>
+                                    <li><i class="fas fa-check text-success me-2"></i>Birth details and zodiac analysis</li>
+                                    <li><i class="fas fa-check text-success me-2"></i>Contact information</li>
+                                </ul>
+                            </div>
+                            <div class="col-md-6">
+                                <ul class="list-unstyled">
+                                    <li><i class="fas fa-check text-success me-2"></i>{{ fingerprint_count }} fingerprint images</li>
+                                    <li><i class="fas fa-check text-success me-2"></i>Submission timestamp</li>
+                                    <li><i class="fas fa-check text-success me-2"></i>Session reference</li>
+                                </ul>
+                            </div>
+                        </div>                    <div class="mt-3 p-3 bg-light rounded">
                         <h6>Report Format:</h6>
                         <p class="mb-0 text-muted">
                             Professional PDF document with organized sections, embedded images, 
