@@ -48,6 +48,11 @@ with app.app_context():
     import models
     db.create_all()
 
+# Vercel serverless function handler
+# This is required for Vercel deployment
+def handler(request):
+    return app(request.environ, request.start_response)
+
 if __name__ == '__main__':
     # Running in debug mode is not recommended for production
     app.run(host='0.0.0.0', port=5000, debug=True)
