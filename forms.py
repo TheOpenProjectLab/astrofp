@@ -1,8 +1,13 @@
 from flask_wtf import FlaskForm
 from flask_wtf.file import FileField, FileAllowed
-from wtforms import StringField, SelectField, DateField, TextAreaField, SubmitField, ValidationError
+from wtforms import StringField, SelectField, DateField, TextAreaField, SubmitField, ValidationError, HiddenField
 from wtforms.validators import DataRequired, Email, Length, Regexp
 from datetime import date
+
+class FaceCaptureForm(FlaskForm):
+    """Form for capturing user's face photo via webcam."""
+    face_image_data = HiddenField('Face Image Data', validators=[DataRequired(message="Please capture your photo.")])
+    next_step = SubmitField('Continue to Personal Details')
 
 class PersonalDetailsForm(FlaskForm):
     """Form for collecting the user's personal information."""

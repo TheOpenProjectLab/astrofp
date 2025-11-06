@@ -1,0 +1,322 @@
+{% extends "base.html" %}
+
+{% block title %}Face Capture - Astrological Fingerprint Collection{% endblock %}
+
+{% block extra_head %}
+<style>
+    .video-container {
+        position: relative;
+        max-width: 640px;
+        margin: 0 auto;
+        border-radius: 10px;
+        overflow: hidden;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+    
+    #webcam {
+        width: 100%;
+        height: auto;
+        display: block;
+    }
+    
+    #canvas {
+        display: none;
+    }
+    
+    .camera-overlay {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 300px;
+        height: 400px;
+        border: 3px dashed rgba(255, 255, 255, 0.7);
+        border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+        pointer-events: none;
+    }
+    
+    .preview-container {
+        max-width: 640px;
+        margin: 20px auto;
+        display: none;
+    }
+    
+    .preview-image {
+        width: 100%;
+        border-radius: 10px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+    
+    .camera-controls {
+        text-align: center;
+        margin-top: 20px;
+    }
+    
+    .btn-capture {
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        border: 4px solid white;
+        background-color: #dc3545;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+        cursor: pointer;
+        transition: all 0.3s;
+    }
+    
+    .btn-capture:hover {
+        transform: scale(1.1);
+        box-shadow: 0 6px 8px rgba(0, 0, 0, 0.3);
+    }
+    
+    .countdown {
+        font-size: 3rem;
+        font-weight: bold;
+        color: #ff8c00;
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+        z-index: 10;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+            <!-- Progress Indicator -->
+            <div class="progress-indicator mb-5">
+                <div class="step-progress">
+                    <div class="step active">
+                        <div class="step-number">1</div>
+                        <div class="step-title">Face Capture</div>
+                    </div>
+                    <div class="step-connector"></div>
+                    <div class="step">
+                        <div class="step-number">2</div>
+                        <div class="step-title">Personal Details</div>
+                    </div>
+                    <div class="step-connector"></div>
+                    <div class="step">
+                        <div class="step-number">3</div>
+                        <div class="step-title">Fingerprints</div>
+                    </div>
+                    <div class="step-connector"></div>
+                    <div class="step">
+                        <div class="step-number">4</div>
+                        <div class="step-title">Complete</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Main Card -->
+            <div class="card shadow-lg">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0">
+                        <i class="fas fa-camera me-2"></i>
+                        Step 1: Capture Your Photo
+                    </h4>
+                    <small>Please allow camera access to capture your photo</small>
+                </div>
+                
+                <div class="card-body">
+                    <!-- Instructions -->
+                    <div class="alert alert-info mb-4">
+                        <h6 class="alert-heading">
+                            <i class="fas fa-info-circle me-2"></i>Photo Capture Instructions
+                        </h6>
+                        <ul class="mb-0">
+                            <li>Position your face within the oval guide</li>
+                            <li>Ensure good lighting and a clear background</li>
+                            <li>Look directly at the camera</li>
+                            <li>Click the capture button when ready</li>
+                        </ul>
+                    </div>
+
+                    <form method="POST" id="faceForm">
+                        {{ form.hidden_tag() }}
+                        
+                        <!-- Webcam View -->
+                        <div id="webcamContainer" class="mb-4">
+                            <div class="video-container">
+                                <video id="webcam" autoplay playsinline></video>
+                                <div class="camera-overlay"></div>
+                                <div id="countdownDisplay" class="countdown" style="display: none;"></div>
+                            </div>
+                            
+                            <div class="camera-controls">
+                                <button type="button" id="captureBtn" class="btn-capture" title="Capture Photo">
+                                    <i class="fas fa-camera text-white"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Preview Section -->
+                        <div id="previewContainer" class="preview-container">
+                            <h5 class="text-center mb-3">
+                                <i class="fas fa-check-circle text-success me-2"></i>
+                                Photo Captured Successfully
+                            </h5>
+                            <img id="preview" class="preview-image" alt="Captured photo">
+                            
+                            <div class="text-center mt-3">
+                                <button type="button" id="retakeBtn" class="btn btn-warning me-2">
+                                    <i class="fas fa-redo me-2"></i>Retake Photo
+                                </button>
+                                <button type="submit" id="continueBtn" class="btn btn-success">
+                                    <i class="fas fa-arrow-right me-2"></i>Continue to Personal Details
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Hidden canvas for capturing image -->
+                        <canvas id="canvas"></canvas>
+                        
+                        <!-- Hidden field to store base64 image data -->
+                        {{ form.face_image_data }}
+                    </form>
+
+                    <!-- Camera not available message -->
+                    <div id="cameraError" class="alert alert-danger" style="display: none;">
+                        <h6 class="alert-heading">
+                            <i class="fas fa-exclamation-triangle me-2"></i>Camera Access Required
+                        </h6>
+                        <p class="mb-0">
+                            Unable to access your camera. Please ensure:
+                        </p>
+                        <ul>
+                            <li>You have granted camera permissions to this website</li>
+                            <li>Your camera is not being used by another application</li>
+                            <li>You are using a secure (HTTPS) connection or localhost</li>
+                        </ul>
+                        <div class="mt-3">
+                            <button type="button" class="btn btn-primary" onclick="location.reload()">
+                                <i class="fas fa-redo me-2"></i>Try Again
+                            </button>
+                            <a href="{{ url_for('step1_personal_details') }}" class="btn btn-outline-secondary">
+                                <i class="fas fa-forward me-2"></i>Skip Photo Capture
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Help Text -->
+            <div class="mt-4 text-center">
+                <small class="text-muted">
+                    <i class="fas fa-shield-alt me-1"></i>
+                    Your photo is captured securely and will only be used for your astrological report.
+                </small>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const video = document.getElementById('webcam');
+    const canvas = document.getElementById('canvas');
+    const captureBtn = document.getElementById('captureBtn');
+    const retakeBtn = document.getElementById('retakeBtn');
+    const preview = document.getElementById('preview');
+    const webcamContainer = document.getElementById('webcamContainer');
+    const previewContainer = document.getElementById('previewContainer');
+    const cameraError = document.getElementById('cameraError');
+    const faceImageInput = document.getElementById('face_image_data');
+    const countdownDisplay = document.getElementById('countdownDisplay');
+    
+    let stream = null;
+
+    // Initialize webcam
+    async function initWebcam() {
+        try {
+            stream = await navigator.mediaDevices.getUserMedia({ 
+                video: { 
+                    width: { ideal: 1280 },
+                    height: { ideal: 720 },
+                    facingMode: 'user'
+                } 
+            });
+            video.srcObject = stream;
+            webcamContainer.style.display = 'block';
+            cameraError.style.display = 'none';
+        } catch (err) {
+            console.error('Error accessing webcam:', err);
+            webcamContainer.style.display = 'none';
+            cameraError.style.display = 'block';
+        }
+    }
+
+    // Capture photo with countdown
+    captureBtn.addEventListener('click', function() {
+        let countdown = 3;
+        countdownDisplay.textContent = countdown;
+        countdownDisplay.style.display = 'block';
+        captureBtn.disabled = true;
+
+        const countdownInterval = setInterval(() => {
+            countdown--;
+            if (countdown > 0) {
+                countdownDisplay.textContent = countdown;
+            } else {
+                clearInterval(countdownInterval);
+                countdownDisplay.style.display = 'none';
+                capturePhoto();
+                captureBtn.disabled = false;
+            }
+        }, 1000);
+    });
+
+    // Capture photo
+    function capturePhoto() {
+        const context = canvas.getContext('2d');
+        
+        // Set canvas dimensions to match video
+        canvas.width = video.videoWidth;
+        canvas.height = video.videoHeight;
+        
+        // Draw video frame to canvas
+        context.drawImage(video, 0, 0, canvas.width, canvas.height);
+        
+        // Convert to base64 image data
+        const imageData = canvas.toDataURL('image/jpeg', 0.9);
+        
+        // Show preview
+        preview.src = imageData;
+        faceImageInput.value = imageData;
+        
+        // Switch views
+        webcamContainer.style.display = 'none';
+        previewContainer.style.display = 'block';
+        
+        // Stop webcam stream
+        if (stream) {
+            stream.getTracks().forEach(track => track.stop());
+        }
+    }
+
+    // Retake photo
+    retakeBtn.addEventListener('click', function() {
+        previewContainer.style.display = 'none';
+        faceImageInput.value = '';
+        initWebcam();
+    });
+
+    // Form validation
+    document.getElementById('faceForm').addEventListener('submit', function(e) {
+        if (!faceImageInput.value) {
+            e.preventDefault();
+            alert('Please capture your photo before continuing.');
+            return false;
+        }
+    });
+
+    // Initialize on load
+    initWebcam();
+});
+</script>
+{% endblock %}

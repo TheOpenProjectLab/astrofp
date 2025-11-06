@@ -7,6 +7,9 @@ class Client(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     session_id = db.Column(db.String(36), unique=True, nullable=False, default=lambda: str(uuid.uuid4()))
     
+    # Face Photo
+    face_photo = db.Column(db.String(500))  # Path to face photo
+    
     # Personal Details
     title = db.Column(db.String(10))
     first_name = db.Column(db.String(50), nullable=False)

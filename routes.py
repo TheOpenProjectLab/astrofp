@@ -1,8 +1,8 @@
 from flask import render_template, request, redirect, url_for, session, flash, send_file, current_app
 from app import app, db
 from models import Client, Fingerprint
-from forms import PersonalDetailsForm, FingerprintUploadForm
-from utils import save_uploaded_file, generate_pdf_report, calculate_age, get_zodiac_sign
+from forms import PersonalDetailsForm, FingerprintUploadForm, FaceCaptureForm
+from utils import save_uploaded_file, save_face_photo, generate_pdf_report, calculate_age, get_zodiac_sign
 import os
 import uuid
 from datetime import datetime
@@ -11,6 +11,33 @@ from datetime import datetime
 def index():
     """Renders the landing page using the index.html template."""
     return render_template('index.html')
+
+@app.route('/step0', methods=['GET', 'POST'])
+def step0_face_capture():
+    """Handles Step 0, capturing the user's face photo via webcam."""
+    form = FaceCaptureForm()
+    
+    if form.validate_on_submit():
+        try:
+            # Generate session ID if not exists
+            if 'session_id' not in session:
+                session['session_id'] = str(uuid.uuid4())
+            
+            # Save face photo
+            face_data = form.face_image_data.data
+            file_info = save_face_photo(face_data, session['session_id'], current_app.config['UPLOAD_FOLDER'])
+            
+            # Store face photo path in session
+            session['face_photo_path'] = file_info['file_path']
+            
+            flash('Photo captured successfully!', 'success')
+            return redirect(url_for('step1_personal_details'))
+        
+        except Exception as e:
+            current_app.logger.error(f"Error saving face photo: {str(e)}")
+            flash('Error capturing photo. Please try again.', 'danger')
+    
+    return render_template('step0_face_capture.html', form=form)
 
 @app.route('/step1', methods=['GET', 'POST'])
 def step1_personal_details():
@@ -72,6 +99,7 @@ def step2_fingerprints():
             client_data = session['client_data']
             client = Client(
                 session_id=session['session_id'],
+                face_photo=session.get('face_photo_path'),
                 title=client_data.get('title'),
                 first_name=client_data['first_name'],
                 middle_name=client_data.get('middle_name'),

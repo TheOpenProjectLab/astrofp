@@ -3,6 +3,7 @@ import uuid
 from datetime import datetime, date
 from PIL import Image
 import secrets
+import base64
 from reportlab.lib import colors
 from reportlab.lib.pagesizes import letter, A4
 from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, Spacer, Image as RLImage
@@ -10,6 +11,59 @@ from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 from reportlab.lib.units import inch
 from reportlab.lib.utils import ImageReader
 import tempfile
+
+def save_face_photo(image_data, session_id, upload_folder):
+    """
+    Save face photo from base64 data
+    """
+    if not image_data or not image_data.startswith('data:image'):
+        raise ValueError("Invalid image data")
+    
+    # Extract base64 data
+    header, encoded = image_data.split(',', 1)
+    image_bytes = base64.b64decode(encoded)
+    
+    # Generate unique filename
+    unique_filename = f"{session_id}_face_{secrets.token_hex(8)}.jpg"
+    
+    # Create session-specific directory
+    session_dir = os.path.join(upload_folder, session_id)
+    os.makedirs(session_dir, exist_ok=True)
+    
+    file_path = os.path.join(session_dir, unique_filename)
+    
+    # Save and validate image
+    try:
+        with open(file_path, 'wb') as f:
+            f.write(image_bytes)
+        
+        # Validate and optimize image
+        with Image.open(file_path) as img:
+            # Convert to RGB if necessary
+            if img.mode != 'RGB':
+                img = img.convert('RGB')
+            
+            # Resize if too large
+            max_dimension = 1024
+            if img.width > max_dimension or img.height > max_dimension:
+                img.thumbnail((max_dimension, max_dimension), Image.Resampling.LANCZOS)
+            
+            # Save optimized version
+            img.save(file_path, 'JPEG', optimize=True, quality=85)
+        
+        file_size = os.path.getsize(file_path)
+        
+        return {
+            'filename': unique_filename,
+            'file_path': file_path,
+            'file_size': file_size
+        }
+    
+    except Exception as e:
+        # Clean up file if validation fails
+        if os.path.exists(file_path):
+            os.remove(file_path)
+        raise ValueError(f"Invalid image file: {str(e)}")
 
 def save_uploaded_file(file, session_id, finger_position, upload_folder):
     """
@@ -144,6 +198,28 @@ def generate_pdf_report(client):
     title = Paragraph("Astrological Client Profile & Fingerprint Report", title_style)
     story.append(title)
     story.append(Spacer(1, 20))
+    
+    # Add face photo if available
+    if client.face_photo and os.path.exists(client.face_photo):
+        try:
+            face_photo_heading = Paragraph("Client Photo", heading_style)
+            story.append(face_photo_heading)
+            story.append(Spacer(1, 10))
+            
+            # Add face photo - centered
+            face_img = RLImage(client.face_photo, width=2.5*inch, height=2.5*inch, kind='proportional')
+            
+            # Create a table to center the image
+            photo_table = Table([[face_img]], colWidths=[2.5*inch])
+            photo_table.setStyle(TableStyle([
+                ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+                ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
+            ]))
+            story.append(photo_table)
+            story.append(Spacer(1, 20))
+        except Exception as e:
+            # Skip if photo can't be loaded
+            pass
     
     # Client Information Section
     client_heading = Paragraph("Personal Information", heading_style)
