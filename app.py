@@ -22,7 +22,15 @@ app.secret_key = os.environ.get("SESSION_SECRET", "a-secure-development-secret-k
 app.wsgi_app = ProxyFix(app.wsgi_app, x_proto=1, x_host=1)
 
 # Configure the database to use a simple SQLite file
-app.config["SQLALCHEMY_DATABASE_URI"] = os.environ.get("DATABASE_URL", "sqlite:///astrology_app.db")
+# For Vercel, use /tmp directory which is writable
+if os.environ.get("VERCEL"):
+    db_path = "/tmp/astrology_app.db"
+    upload_path = "/tmp/uploads"
+else:
+    db_path = "astrology_app.db"
+    upload_path = os.path.join(os.getcwd(), 'static', 'uploads')
+
+app.config["SQLALCHEMY_DATABASE_URI"] = os.environ.get("DATABASE_URL", f"sqlite:///{db_path}")
 app.config["SQLALCHEMY_ENGINE_OPTIONS"] = {
     "pool_recycle": 300,
     "pool_pre_ping": True,
@@ -30,28 +38,34 @@ app.config["SQLALCHEMY_ENGINE_OPTIONS"] = {
 
 # Configure file uploads
 app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # 16MB max file size for all uploads
-app.config['UPLOAD_FOLDER'] = os.path.join(os.getcwd(), 'static', 'uploads')
+app.config['UPLOAD_FOLDER'] = upload_path
 
 # Ensure the upload directory exists
-os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
+try:
+    os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
+except Exception as e:
+    logging.warning(f"Could not create upload directory: {e}")
 
 # Initialize extensions
 db.init_app(app)
 csrf.init_app(app)
 
 # Import routes after app creation to avoid circular imports
-from routes import *
+try:
+    from routes import *
+except ImportError as e:
+    logging.error(f"Error importing routes: {e}")
+    raise
 
 # Create database tables within the application context
-with app.app_context():
-    # Import models to ensure their tables are created
-    import models
-    db.create_all()
-
-# Vercel serverless function handler
-# This is required for Vercel deployment
-def handler(request):
-    return app(request.environ, request.start_response)
+try:
+    with app.app_context():
+        # Import models to ensure their tables are created
+        import models
+        db.create_all()
+except Exception as e:
+    logging.error(f"Error creating database tables: {e}")
+    # Don't raise - allow app to start even if DB creation fails
 
 if __name__ == '__main__':
     # Running in debug mode is not recommended for production
