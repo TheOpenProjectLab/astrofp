@@ -26,6 +26,11 @@ static/uploads/*
 # Vercel
 .vercel
 
+# UV / Poetry (use requirements.txt instead)
+uv.lock
+pyproject.toml
+poetry.lock
+
 # OS / editor files
 .DS_Store
 Thumbs.db
