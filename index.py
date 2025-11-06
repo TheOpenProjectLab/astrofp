@@ -1,4 +1,9 @@
+"""
+Vercel entry point for Flask application.
+This file must be named 'index.py' and export 'app' for Vercel to work.
+"""
+
 from app import app
 
-# This is the entry point for Vercel
-# Vercel will look for 'app' in this file
+# Vercel will automatically use the 'app' object
+# No need for additional configuration

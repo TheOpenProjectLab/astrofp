@@ -50,22 +50,20 @@ except Exception as e:
 db.init_app(app)
 csrf.init_app(app)
 
-# Import routes after app creation to avoid circular imports
-try:
-    from routes import *
-except ImportError as e:
-    logging.error(f"Error importing routes: {e}")
-    raise
+# Import models first (must be before routes)
+import models
 
-# Create database tables within the application context
-try:
-    with app.app_context():
-        # Import models to ensure their tables are created
-        import models
+# Import routes after app and models are initialized
+import routes
+
+# Create database tables
+with app.app_context():
+    try:
         db.create_all()
-except Exception as e:
-    logging.error(f"Error creating database tables: {e}")
-    # Don't raise - allow app to start even if DB creation fails
+        logging.info("Database tables created successfully")
+    except Exception as e:
+        logging.error(f"Error creating database tables: {e}")
+        # Continue anyway - tables might already exist
 
 if __name__ == '__main__':
     # Running in debug mode is not recommended for production
