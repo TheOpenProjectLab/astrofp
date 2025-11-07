@@ -21,50 +21,31 @@ app = Flask(__name__)
 app.secret_key = os.environ.get("SESSION_SECRET", "a-secure-development-secret-key")
 app.wsgi_app = ProxyFix(app.wsgi_app, x_proto=1, x_host=1)
 
-# Configure the database to use a simple SQLite file
-# For Vercel, use /tmp directory which is writable
-if os.environ.get("VERCEL"):
-    db_path = "/tmp/astrology_app.db"
-    upload_path = "/tmp/uploads"
-else:
-    db_path = "astrology_app.db"
-    upload_path = os.path.join(os.getcwd(), 'static', 'uploads')
-
-app.config["SQLALCHEMY_DATABASE_URI"] = os.environ.get("DATABASE_URL", f"sqlite:///{db_path}")
+# Configure the database
+app.config["SQLALCHEMY_DATABASE_URI"] = os.environ.get("DATABASE_URL", "sqlite:///astrology_app.db")
 app.config["SQLALCHEMY_ENGINE_OPTIONS"] = {
     "pool_recycle": 300,
     "pool_pre_ping": True,
 }
 
 # Configure file uploads
-app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # 16MB max file size for all uploads
-app.config['UPLOAD_FOLDER'] = upload_path
+app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # 16MB max file size
+app.config['UPLOAD_FOLDER'] = os.path.join(os.getcwd(), 'static', 'uploads')
 
 # Ensure the upload directory exists
-try:
-    os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
-except Exception as e:
-    logging.warning(f"Could not create upload directory: {e}")
+os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
 
 # Initialize extensions
 db.init_app(app)
 csrf.init_app(app)
 
-# Import models first (must be before routes)
+# Import models and routes
 import models
-
-# Import routes after app and models are initialized
 import routes
 
 # Create database tables
 with app.app_context():
-    try:
-        db.create_all()
-        logging.info("Database tables created successfully")
-    except Exception as e:
-        logging.error(f"Error creating database tables: {e}")
-        # Continue anyway - tables might already exist
+    db.create_all()
 
 if __name__ == '__main__':
-    # Running in debug mode is not recommended for production
     app.run(host='0.0.0.0', port=5000, debug=True)
