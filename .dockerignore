@@ -1,0 +1,57 @@
+# Ignore Docker-related files
+Dockerfile
+docker-compose.yml
+.dockerignore
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+
+# Virtual environments
+env/
+venv/
+ENV/
+.venv
+
+# Development database (will be created in container)
+*.db
+*.sqlite
+*.sqlite3
+
+# Uploads (will be volume-mounted)
+static/uploads/*
+!static/uploads/.gitkeep
+
+# Environment files
+.env
+.env.local
+.env.production
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Git
+.git/
+.gitignore
+
+# Testing
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Vercel (not needed for Docker)
+.vercel
+vercel.json
+test_index.py
+VERCEL_*.md
