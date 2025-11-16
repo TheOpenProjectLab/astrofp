@@ -232,8 +232,17 @@ Astrological Fingerprint Collection{% endblock %} {% block content %}
                         <i class="fas fa-fingerprint me-1"></i>
                         {{ finger_names[field_name] }} ({{ field_name }})
                       </label>
-                      {{ form[field_name](class="form-control file-input",
-                      accept=".jpg,.jpeg,.png") }}
+                      <div class="input-group">
+                        {{ form[field_name](class="form-control file-input",
+                        accept=".jpg,.jpeg,.png", style="display:none;") }}
+                        <button type="button" class="btn btn-outline-primary choose-file-btn" style="flex: 1;">
+                          <i class="fas fa-folder-open me-2"></i>Choose File
+                        </button>
+                        <button type="button" class="btn btn-outline-success capture-camera-btn" style="flex: 1;">
+                          <i class="fas fa-camera me-2"></i>Take Photo
+                        </button>
+                      </div>
+                      <small class="text-muted d-block mt-1 file-name-display">No file selected</small>
                       <div class="upload-preview mt-2" style="display: none">
                         <img class="preview-image" src="" alt="Preview" />
                         <button
@@ -372,8 +381,17 @@ Astrological Fingerprint Collection{% endblock %} {% block content %}
                         <i class="fas fa-fingerprint me-1"></i>
                         {{ finger_names[field_name] }} ({{ field_name }})
                       </label>
-                      {{ form[field_name](class="form-control file-input",
-                      accept=".jpg,.jpeg,.png") }}
+                      <div class="input-group">
+                        {{ form[field_name](class="form-control file-input",
+                        accept=".jpg,.jpeg,.png", style="display:none;") }}
+                        <button type="button" class="btn btn-outline-primary choose-file-btn" style="flex: 1;">
+                          <i class="fas fa-folder-open me-2"></i>Choose File
+                        </button>
+                        <button type="button" class="btn btn-outline-success capture-camera-btn" style="flex: 1;">
+                          <i class="fas fa-camera me-2"></i>Take Photo
+                        </button>
+                      </div>
+                      <small class="text-muted d-block mt-1 file-name-display">No file selected</small>
                       <div class="upload-preview mt-2" style="display: none">
                         <img class="preview-image" src="" alt="Preview" />
                         <button
@@ -467,6 +485,26 @@ Astrological Fingerprint Collection{% endblock %} {% block content %}
     const submitBtn = document.getElementById("submitBtn");
     const uploadedCountEl = document.getElementById("uploadedCount");
     let uploadedCount = 0;
+    let currentCameraStream = null;
+    let currentUploadItem = null;
+
+    // Handle "Choose File" button clicks
+    document.querySelectorAll(".choose-file-btn").forEach((btn) => {
+      btn.addEventListener("click", function () {
+        const uploadItem = this.closest(".upload-item");
+        const fileInput = uploadItem.querySelector(".file-input");
+        fileInput.click();
+      });
+    });
+
+    // Handle "Take Photo" button clicks
+    document.querySelectorAll(".capture-camera-btn").forEach((btn) => {
+      btn.addEventListener("click", function () {
+        const uploadItem = this.closest(".upload-item");
+        const fingerPosition = uploadItem.dataset.finger;
+        openCameraModal(uploadItem, fingerPosition);
+      });
+    });
 
     // Handle file uploads and previews
     fileInputs.forEach((input) => {
@@ -476,6 +514,7 @@ Astrological Fingerprint Collection{% endblock %} {% block content %}
         const preview = uploadItem.querySelector(".upload-preview");
         const previewImg = uploadItem.querySelector(".preview-image");
         const fingerPosition = uploadItem.dataset.finger;
+        const fileNameDisplay = uploadItem.querySelector(".file-name-display");
 
         if (file) {
           // Validate file type
@@ -496,6 +535,9 @@ Astrological Fingerprint Collection{% endblock %} {% block content %}
           reader.onload = function (e) {
             previewImg.src = e.target.result;
             preview.style.display = "block";
+            fileNameDisplay.textContent = file.name;
+            fileNameDisplay.classList.remove("text-muted");
+            fileNameDisplay.classList.add("text-success");
 
             // Update finger circle in SVG
             const handSvg = uploadItem
@@ -515,6 +557,9 @@ Astrological Fingerprint Collection{% endblock %} {% block content %}
         } else {
           // Hide preview
           preview.style.display = "none";
+          fileNameDisplay.textContent = "No file selected";
+          fileNameDisplay.classList.add("text-muted");
+          fileNameDisplay.classList.remove("text-success");
 
           // Reset finger circle
           const handSvg = uploadItem
@@ -533,6 +578,199 @@ Astrological Fingerprint Collection{% endblock %} {% block content %}
       });
     });
 
+    // Camera Modal Functions
+    function openCameraModal(uploadItem, fingerPosition) {
+      currentUploadItem = uploadItem;
+
+      // Create modal
+      const modal = document.createElement("div");
+      modal.className = "modal fade";
+      modal.id = "cameraModal";
+      modal.innerHTML = `
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title">
+                <i class="fas fa-camera me-2"></i>Capture Fingerprint - ${fingerPosition}
+              </h5>
+              <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body text-center p-0">
+              <div class="camera-container position-relative" style="width: 100%; aspect-ratio: 4/3; margin: 0 auto; overflow: hidden;">
+                <video id="cameraVideo" autoplay playsinline style="width: 100%; height: 100%; object-fit: cover; background: #000;"></video>
+                <canvas id="cameraCanvas" style="display: none;"></canvas>
+                
+                <!-- Finger Position Guide Overlay -->
+                <div id="fingerGuideOverlay" style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; pointer-events: none;">
+                  <svg viewBox="0 0 100 100" style="width: 100%; height: 100%;" preserveAspectRatio="xMidYMid meet">
+                    <!-- Semi-transparent overlay -->
+                    <defs>
+                      <mask id="fingerMask">
+                        <rect width="100" height="100" fill="white"/>
+                        <ellipse cx="50" cy="50" rx="18" ry="25" fill="black"/>
+                      </mask>
+                    </defs>
+                    <rect width="100" height="100" fill="rgba(0,0,0,0.5)" mask="url(#fingerMask)"/>
+                    
+                    <!-- Finger outline guide -->
+                    <ellipse cx="50" cy="50" rx="18" ry="25" fill="none" stroke="#00ff00" stroke-width="0.5" stroke-dasharray="2,1"/>
+                    
+                    <!-- Corner guides -->
+                    <line x1="32" y1="25" x2="36" y2="25" stroke="#00ff00" stroke-width="0.8"/>
+                    <line x1="32" y1="25" x2="32" y2="29" stroke="#00ff00" stroke-width="0.8"/>
+                    
+                    <line x1="68" y1="25" x2="64" y2="25" stroke="#00ff00" stroke-width="0.8"/>
+                    <line x1="68" y1="25" x2="68" y2="29" stroke="#00ff00" stroke-width="0.8"/>
+                    
+                    <line x1="32" y1="75" x2="36" y2="75" stroke="#00ff00" stroke-width="0.8"/>
+                    <line x1="32" y1="75" x2="32" y2="71" stroke="#00ff00" stroke-width="0.8"/>
+                    
+                    <line x1="68" y1="75" x2="64" y2="75" stroke="#00ff00" stroke-width="0.8"/>
+                    <line x1="68" y1="75" x2="68" y2="71" stroke="#00ff00" stroke-width="0.8"/>
+                    
+                    <!-- Center text -->
+                    <text x="50" y="15" text-anchor="middle" fill="#00ff00" font-size="4" font-weight="bold">Position Finger Here</text>
+                  </svg>
+                </div>
+                
+                <div id="capturedImageContainer" style="display: none; width: 100%; height: 100%;">
+                  <img id="capturedImage" style="width: 100%; height: 100%; object-fit: contain;" />
+                </div>
+              </div>
+              <div class="alert alert-info m-3 mb-0">
+                <i class="fas fa-info-circle me-2"></i>
+                <small>Position the finger within the green guide and click "Capture"</small>
+              </div>
+            </div>
+            <div class="modal-footer flex-wrap justify-content-center">
+              <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">
+                <i class="fas fa-times me-1"></i>Cancel
+              </button>
+              <button type="button" class="btn btn-primary btn-sm" id="retakeBtn" style="display: none;">
+                <i class="fas fa-redo me-1"></i>Retake
+              </button>
+              <button type="button" class="btn btn-success btn-sm" id="captureBtn">
+                <i class="fas fa-camera me-1"></i>Capture
+              </button>
+              <button type="button" class="btn btn-success btn-sm" id="usePhotoBtn" style="display: none;">
+                <i class="fas fa-check me-1"></i>Use This Photo
+              </button>
+            </div>
+          </div>
+        </div>
+      `;
+
+      document.body.appendChild(modal);
+      const bsModal = new bootstrap.Modal(modal);
+      bsModal.show();
+
+      // Start camera
+      startCamera();
+
+      // Handle capture
+      document.getElementById("captureBtn").addEventListener("click", capturePhoto);
+      document.getElementById("retakeBtn").addEventListener("click", retakePhoto);
+      document.getElementById("usePhotoBtn").addEventListener("click", function () {
+        usePhoto();
+        bsModal.hide();
+      });
+
+      // Cleanup on modal close
+      modal.addEventListener("hidden.bs.modal", function () {
+        stopCamera();
+        modal.remove();
+      });
+    }
+
+    async function startCamera() {
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({
+          video: { facingMode: "environment", width: { ideal: 1280 }, height: { ideal: 720 } },
+        });
+        currentCameraStream = stream;
+        const video = document.getElementById("cameraVideo");
+        video.srcObject = stream;
+      } catch (error) {
+        console.error("Camera access error:", error);
+        alert("Unable to access camera. Please check permissions.");
+      }
+    }
+
+    function capturePhoto() {
+      const video = document.getElementById("cameraVideo");
+      const canvas = document.getElementById("cameraCanvas");
+      const capturedImage = document.getElementById("capturedImage");
+      const capturedImageContainer = document.getElementById("capturedImageContainer");
+      const fingerGuideOverlay = document.getElementById("fingerGuideOverlay");
+
+      canvas.width = video.videoWidth;
+      canvas.height = video.videoHeight;
+      const ctx = canvas.getContext("2d");
+      ctx.drawImage(video, 0, 0);
+
+      const imageDataUrl = canvas.toDataURL("image/jpeg", 0.9);
+      capturedImage.src = imageDataUrl;
+
+      // Hide video and guide, show captured image
+      video.style.display = "none";
+      fingerGuideOverlay.style.display = "none";
+      capturedImageContainer.style.display = "block";
+
+      // Toggle buttons
+      document.getElementById("captureBtn").style.display = "none";
+      document.getElementById("retakeBtn").style.display = "inline-block";
+      document.getElementById("usePhotoBtn").style.display = "inline-block";
+
+      stopCamera();
+    }
+
+    function retakePhoto() {
+      const video = document.getElementById("cameraVideo");
+      const capturedImageContainer = document.getElementById("capturedImageContainer");
+      const fingerGuideOverlay = document.getElementById("fingerGuideOverlay");
+
+      video.style.display = "block";
+      capturedImageContainer.style.display = "none";
+      fingerGuideOverlay.style.display = "block";
+
+      document.getElementById("captureBtn").style.display = "inline-block";
+      document.getElementById("retakeBtn").style.display = "none";
+      document.getElementById("usePhotoBtn").style.display = "none";
+
+      startCamera();
+    }
+
+    function usePhoto() {
+      const canvas = document.getElementById("cameraCanvas");
+      canvas.toBlob(
+        function (blob) {
+          const file = new File([blob], `fingerprint_${Date.now()}.jpg`, {
+            type: "image/jpeg",
+          });
+
+          // Create a DataTransfer to set the file input
+          const dataTransfer = new DataTransfer();
+          dataTransfer.items.add(file);
+
+          const fileInput = currentUploadItem.querySelector(".file-input");
+          fileInput.files = dataTransfer.files;
+
+          // Trigger change event
+          const event = new Event("change", { bubbles: true });
+          fileInput.dispatchEvent(event);
+        },
+        "image/jpeg",
+        0.9
+      );
+    }
+
+    function stopCamera() {
+      if (currentCameraStream) {
+        currentCameraStream.getTracks().forEach((track) => track.stop());
+        currentCameraStream = null;
+      }
+    }
+
     // Remove file functionality
     document.addEventListener("click", function (e) {
       if (
@@ -543,9 +781,13 @@ Astrological Fingerprint Collection{% endblock %} {% block content %}
         const fileInput = uploadItem.querySelector(".file-input");
         const preview = uploadItem.querySelector(".upload-preview");
         const fingerPosition = uploadItem.dataset.finger;
+        const fileNameDisplay = uploadItem.querySelector(".file-name-display");
 
         fileInput.value = "";
         preview.style.display = "none";
+        fileNameDisplay.textContent = "No file selected";
+        fileNameDisplay.classList.add("text-muted");
+        fileNameDisplay.classList.remove("text-success");
 
         // Reset finger circle
         const handSvg = uploadItem

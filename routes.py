@@ -133,7 +133,7 @@ def step2_fingerprints():
             
             db.session.commit()
             session['client_id'] = client.id
-            flash(f'Application submitted successfully! {len(uploaded_fingerprints)} fingerprints uploaded.', 'success')
+            flash(f'Profile Captured successfully! {len(uploaded_fingerprints)} fingerprints uploaded.', 'success')
             return redirect(url_for('submission_success'))
 
         except Exception as e:

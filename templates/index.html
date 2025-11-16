@@ -58,10 +58,10 @@
     /* Unchanged Original Animation CSS */
     .zodiac-circle {
         position: relative;
-        width: 350px;
-        height: 350px;
+        width: 300px;
+        height: 300px;
         border-radius: 50%;
-        border: 2px dashed var(--brand-accent);
+        border: 2px dashed;
         display: flex;
         justify-content: center;
         align-items: center;
@@ -74,27 +74,18 @@
         height: 100%;
         top: 0;
         left: 0;
-        animation: spin 30s linear infinite;
     }
     .zodiac-symbol {
         position: absolute;
         top: 50%;
         left: 50%;
-        transform-origin: center;
-        transform: translate(-50%, -50%) rotate(calc(30deg * var(--i))) translateY(-158px) rotate(calc(-30deg * var(--i)));
-        font-size: 1.8rem;
-        padding: 8px;
-        width: 40px;
-        height: 40px;
+        transform: translate(-50%, -50%) rotate(calc(30deg * var(--i))) translateY(-150px) rotate(calc(-30deg * var(--i)));
+        font-size: 1.5rem;
+        padding: 5px;
+        width: 35px;
+        height: 35px;
         text-align: center;
-        line-height: 24px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-    }
-    .astrology-visual .fa-hand-paper {
-        position: relative;
-        z-index: 10;
+        line-height: 25px;
     }
     @keyframes spin {
         from { transform: rotate(0deg); }
